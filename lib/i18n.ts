@@ -26,6 +26,9 @@ const translations = {
       purchaseCount: "購入数",
       viewAll: "すべて見る",
       searchHero: "スキルサーチ（74,000件以上）を見る",
+      tabAll: "すべて",
+      tabFree: "無料",
+      tabPaid: "有料",
     },
     skills: {
       title: "スキル一覧",
@@ -37,8 +40,12 @@ const translations = {
       sortPopular: "人気順",
       sortPrice: "価格順",
       allTools: "すべてのツール",
+      allCategories: "すべてのカテゴリ",
       free: "無料",
       noResults: "スキルが見つかりませんでした",
+      priceAll: "すべて",
+      priceFree: "無料",
+      pricePaid: "有料",
     },
     product: {
       buy: "購入する",
@@ -51,6 +58,7 @@ const translations = {
       preview: "プレビュー",
       repoLink: "リポジトリを見る",
       tool: "対応ツール",
+      compatibleTools: "対応AIツール",
     },
     sell: {
       title: "スキルを販売する",
@@ -58,9 +66,14 @@ const translations = {
       formTitle: "スキルタイトル",
       formDesc: "説明",
       formPrice: "価格（円）",
+      formPriceType: "価格タイプ",
+      priceFree: "無料",
+      pricePaid: "有料（価格設定）",
       formTool: "対応ツール",
+      formTools: "対応AIツール（複数選択可）",
       formCategory: "カテゴリ",
-      formTags: "タグ（カンマ区切り）",
+      formSubcategory: "サブカテゴリ",
+      formTags: "タグ（最大10個、カンマ区切り）",
       formContent: "SKILL.md コンテンツ",
       formRepoUrl: "GitHubリポジトリURL",
       formLang: "言語",
@@ -161,6 +174,9 @@ const translations = {
       purchaseCount: "purchases",
       viewAll: "View All",
       searchHero: "Explore Skill Search (74,000+ skills)",
+      tabAll: "All",
+      tabFree: "Free",
+      tabPaid: "Paid",
     },
     skills: {
       title: "Browse Skills",
@@ -172,8 +188,12 @@ const translations = {
       sortPopular: "Most Popular",
       sortPrice: "Price",
       allTools: "All Tools",
+      allCategories: "All Categories",
       free: "Free",
       noResults: "No skills found",
+      priceAll: "All",
+      priceFree: "Free",
+      pricePaid: "Paid",
     },
     product: {
       buy: "Buy Now",
@@ -186,6 +206,7 @@ const translations = {
       preview: "Preview",
       repoLink: "View Repository",
       tool: "Tool",
+      compatibleTools: "Compatible AI Tools",
     },
     sell: {
       title: "Sell Your Skill",
@@ -193,9 +214,14 @@ const translations = {
       formTitle: "Skill Title",
       formDesc: "Description",
       formPrice: "Price (¥)",
+      formPriceType: "Price Type",
+      priceFree: "Free",
+      pricePaid: "Paid (set price)",
       formTool: "Target Tool",
+      formTools: "Compatible AI Tools (multi-select)",
       formCategory: "Category",
-      formTags: "Tags (comma separated)",
+      formSubcategory: "Subcategory",
+      formTags: "Tags (up to 10, comma separated)",
       formContent: "SKILL.md Content",
       formRepoUrl: "GitHub Repository URL",
       formLang: "Language",
@@ -296,6 +322,9 @@ const translations = {
       purchaseCount: "次购买",
       viewAll: "查看全部",
       searchHero: "查看技能搜索（74,000+技能）",
+      tabAll: "全部",
+      tabFree: "免费",
+      tabPaid: "付费",
     },
     skills: {
       title: "浏览技能",
@@ -307,8 +336,12 @@ const translations = {
       sortPopular: "最热门",
       sortPrice: "价格",
       allTools: "所有工具",
+      allCategories: "所有分类",
       free: "免费",
       noResults: "未找到技能",
+      priceAll: "全部",
+      priceFree: "免费",
+      pricePaid: "付费",
     },
     product: {
       buy: "立即购买",
@@ -321,6 +354,7 @@ const translations = {
       preview: "预览",
       repoLink: "查看仓库",
       tool: "工具",
+      compatibleTools: "兼容AI工具",
     },
     sell: {
       title: "出售技能",
@@ -328,9 +362,14 @@ const translations = {
       formTitle: "技能标题",
       formDesc: "描述",
       formPrice: "价格（¥）",
+      formPriceType: "价格类型",
+      priceFree: "免费",
+      pricePaid: "付费（设置价格）",
       formTool: "目标工具",
+      formTools: "兼容AI工具（可多选）",
       formCategory: "分类",
-      formTags: "标签（逗号分隔）",
+      formSubcategory: "子分类",
+      formTags: "标签（最多10个，逗号分隔）",
       formContent: "SKILL.md 内容",
       formRepoUrl: "GitHub仓库URL",
       formLang: "语言",
@@ -412,10 +451,10 @@ const translations = {
 
 export type Translations = {
   nav: { home: string; skills: string; categories: string; sell: string; mypage: string; login: string; logout: string };
-  home: { hero: string; heroSub: string; browseSkills: string; sellSkill: string; totalSkills: string; totalSellers: string; totalPurchases: string; featuredSkills: string; freeLabel: string; purchaseCount: string; viewAll: string; searchHero: string };
-  skills: { title: string; searchPlaceholder: string; filterTool: string; filterCategory: string; sortBy: string; sortNewest: string; sortPopular: string; sortPrice: string; allTools: string; free: string; noResults: string };
-  product: { buy: string; free: string; stars: string; purchases: string; author: string; category: string; tags: string; preview: string; repoLink: string; tool: string };
-  sell: { title: string; subtitle: string; formTitle: string; formDesc: string; formPrice: string; formTool: string; formCategory: string; formTags: string; formContent: string; formRepoUrl: string; formLang: string; submit: string; loginRequired: string; success: string };
+  home: { hero: string; heroSub: string; browseSkills: string; sellSkill: string; totalSkills: string; totalSellers: string; totalPurchases: string; featuredSkills: string; freeLabel: string; purchaseCount: string; viewAll: string; searchHero: string; tabAll: string; tabFree: string; tabPaid: string };
+  skills: { title: string; searchPlaceholder: string; filterTool: string; filterCategory: string; sortBy: string; sortNewest: string; sortPopular: string; sortPrice: string; allTools: string; allCategories: string; free: string; noResults: string; priceAll: string; priceFree: string; pricePaid: string };
+  product: { buy: string; free: string; stars: string; purchases: string; author: string; category: string; tags: string; preview: string; repoLink: string; tool: string; compatibleTools: string };
+  sell: { title: string; subtitle: string; formTitle: string; formDesc: string; formPrice: string; formPriceType: string; priceFree: string; pricePaid: string; formTool: string; formTools: string; formCategory: string; formSubcategory: string; formTags: string; formContent: string; formRepoUrl: string; formLang: string; submit: string; loginRequired: string; success: string };
   mypage: { title: string; listings: string; purchases: string; noListings: string; noPurchases: string; loginRequired: string; edit: string; delete: string; profileLink: string; completion: string };
   categories: { title: string; skillCount: string };
   common: { loading: string; error: string; back: string; free: string; yen: string };

@@ -1,10 +1,14 @@
-export type Tool = "claude-code" | "cursor" | "copilot" | "codex" | "windsurf" | "other";
+import type { ToolId } from "@/lib/tools";
+
+export type { ToolId };
+export type Tool = ToolId; // backward compat alias
 export type Lang = "ja" | "en" | "zh";
 export type Availability = "available" | "depends" | "busy";
+export type PriceType = "free" | "paid";
 
 export interface Author {
   name: string;
-  login: string;        // URL-safe username (GitHub login)
+  login: string;
   githubUrl: string;
   avatar: string;
 }
@@ -21,8 +25,11 @@ export interface Product {
   description_en?: string;
   description_zh?: string;
   price: number;
-  tool: Tool;
-  category: string;
+  price_type: PriceType;
+  tool: Tool;                   // primary tool (for filter compat)
+  compatible_tools: string[];   // all compatible tools
+  category: string;             // category id e.g. "dev-tools"
+  subcategory?: string;         // subcategory id e.g. "code-review"
   tags: string[];
   author: Author;
   content: string;
@@ -65,12 +72,12 @@ export interface PortfolioEntry {
 }
 
 export interface UserProfile {
-  username: string;           // URL key (GitHub login)
+  username: string;
   displayName: string;
   avatar: string;
   coverImage: string;
   catchphrase: string;
-  bio: string;               // Markdown
+  bio: string;
   specialties: string[];
   supportedTools: string[];
   skills: string[];

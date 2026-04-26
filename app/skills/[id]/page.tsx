@@ -6,6 +6,8 @@ import Image from "next/image";
 import { useLanguage } from "@/components/LanguageContext";
 import { toolColors } from "@/lib/toolColors";
 import { localTitle, localDescription } from "@/lib/localizeProduct";
+import { TOOL_MAP } from "@/lib/tools";
+import { getCategoryName } from "@/lib/categories";
 import type { Product, UserProfile, Availability } from "@/types";
 
 const AVAILABILITY_STYLE: Record<Availability, { label: string; cls: string }> = {
@@ -56,14 +58,17 @@ export default function ProductPage() {
         {/* Main */}
         <div className="lg:col-span-2 space-y-6">
           <div>
-            <div className="flex items-center gap-3 mb-3">
-              <span
-                className="text-xs font-semibold px-2.5 py-1 rounded-full"
-                style={{ backgroundColor: tool.bg, color: tool.text }}
-              >
-                {tool.label}
-              </span>
-              <span className="text-xs text-gray-400">{product.category}</span>
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              {(product.compatible_tools?.length ? product.compatible_tools : [product.tool]).map((tid) => {
+                const tm = TOOL_MAP[tid as keyof typeof TOOL_MAP];
+                if (!tm) return null;
+                return (
+                  <span key={tid} className={`text-xs font-semibold px-2.5 py-1 rounded-full ${tm.badgeClass}`}>
+                    {tm.name}
+                  </span>
+                );
+              })}
+              <span className="text-xs text-gray-400">{getCategoryName(product.category, locale)}</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">{title}</h1>
             <p className="text-gray-600 leading-relaxed">{desc}</p>

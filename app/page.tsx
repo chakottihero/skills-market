@@ -3,11 +3,13 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import ProductCard from "@/components/ProductCard";
 import { useLanguage } from "@/components/LanguageContext";
+import { TOOLS } from "@/lib/tools";
 import type { Product } from "@/types";
 
 export default function HomePage() {
   const { t } = useLanguage();
-  const [featured, setFeatured] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [priceTab, setPriceTab] = useState<"" | "free" | "paid">("");
   const [stats, setStats] = useState({ skills: 0, sellers: 0, purchases: 0 });
 
   useEffect(() => {
@@ -15,12 +17,14 @@ export default function HomePage() {
       .then((r) => r.json())
       .then((d) => {
         const products = d.products as Product[];
-        setFeatured(products.slice(0, 4));
+        setAllProducts(products);
         const uniqueSellers = new Set(products.map((p) => p.author.name)).size;
         const totalPurchases = products.reduce((sum, p) => sum + p.purchases, 0);
         setStats({ skills: products.length, sellers: uniqueSellers, purchases: totalPurchases });
       });
   }, []);
+
+  const featured = (priceTab ? allProducts.filter((p) => p.price_type === priceTab) : allProducts).slice(0, 4);
 
   return (
     <div>
@@ -86,11 +90,26 @@ export default function HomePage() {
 
       {/* Featured Skills */}
       <section className="max-w-7xl mx-auto px-4 py-16">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <h2 className="text-2xl font-bold text-gray-900">{t.home.featuredSkills}</h2>
-          <Link href="/skills" className="text-sm text-purple-600 hover:underline">
-            {t.home.viewAll} →
-          </Link>
+          <div className="flex items-center gap-4">
+            <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+              {([["", t.home.tabAll], ["free", t.home.tabFree], ["paid", t.home.tabPaid]] as const).map(([val, label]) => (
+                <button
+                  key={val}
+                  onClick={() => setPriceTab(val)}
+                  className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                    priceTab === val ? "bg-white text-purple-700 shadow-sm" : "text-gray-500 hover:text-gray-800"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <Link href="/skills" className="text-sm text-purple-600 hover:underline whitespace-nowrap">
+              {t.home.viewAll} →
+            </Link>
+          </div>
         </div>
         {featured.length === 0 ? (
           <div className="text-center text-gray-400 py-16">{t.common.loading}</div>
@@ -107,20 +126,15 @@ export default function HomePage() {
       <section className="bg-white border-t border-gray-100 py-12 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-sm text-gray-500 mb-6">Supported AI Tools</p>
-          <div className="flex flex-wrap justify-center gap-3">
-            {[
-              { label: "Claude Code", color: "#8B5CF6" },
-              { label: "Cursor", color: "#3B82F6" },
-              { label: "Copilot", color: "#10B981" },
-              { label: "Codex", color: "#F59E0B" },
-            ].map(({ label, color }) => (
-              <span
-                key={label}
-                className="px-4 py-2 rounded-full text-sm font-semibold text-white"
-                style={{ backgroundColor: color }}
+          <div className="flex flex-wrap justify-center gap-2">
+            {TOOLS.filter((tk) => tk.id !== "other").map((tk) => (
+              <Link
+                key={tk.id}
+                href={`/skills?tool=${tk.id}`}
+                className={`px-4 py-2 rounded-full text-sm font-semibold transition-opacity hover:opacity-80 ${tk.badgeClass}`}
               >
-                {label}
-              </span>
+                {tk.name}
+              </Link>
             ))}
           </div>
         </div>

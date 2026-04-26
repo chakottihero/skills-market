@@ -15,9 +15,11 @@ const SPECIALTIES = [
 const TOOLS: { value: Tool; label: string }[] = [
   { value: "claude-code", label: "Claude Code" },
   { value: "cursor", label: "Cursor" },
-  { value: "copilot", label: "Copilot" },
-  { value: "codex", label: "Codex" },
+  { value: "copilot", label: "GitHub Copilot" },
   { value: "windsurf", label: "Windsurf" },
+  { value: "cline", label: "Cline" },
+  { value: "roo-code", label: "Roo Code" },
+  { value: "aider", label: "Aider" },
   { value: "other", label: "その他" },
 ];
 
