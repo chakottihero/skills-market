@@ -5,31 +5,46 @@ import Link from "next/link";
 import Image from "next/image";
 import { useLanguage } from "@/components/LanguageContext";
 import { toolColors } from "@/lib/toolColors";
-import type { Product } from "@/types";
+import { localTitle, localDescription } from "@/lib/localizeProduct";
+import type { Product, UserProfile, Availability } from "@/types";
+
+const AVAILABILITY_STYLE: Record<Availability, { label: string; cls: string }> = {
+  available: { label: "対応可能", cls: "bg-emerald-100 text-emerald-700" },
+  depends:   { label: "内容による", cls: "bg-amber-100 text-amber-700" },
+  busy:      { label: "多忙", cls: "bg-red-100 text-red-700" },
+};
 
 export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   const [product, setProduct] = useState<Product | null>(null);
+  const [seller, setSeller] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch(`/api/products/${id}`)
-      .then((r) => {
-        if (!r.ok) throw new Error("not found");
-        return r.json();
+      .then((r) => { if (!r.ok) throw new Error("not found"); return r.json(); })
+      .then(async (d) => {
+        const p = d.product as Product;
+        setProduct(p);
+        setLoading(false);
+        // 出品者プロフィールを非同期で取得
+        try {
+          const pr = await fetch(`/api/users/${p.author.login}`);
+          if (pr.ok) setSeller((await pr.json()).profile as UserProfile);
+        } catch {}
       })
-      .then((d) => { setProduct(d.product as Product); setLoading(false); })
       .catch(() => router.push("/skills"));
   }, [id, router]);
 
-  if (loading) {
-    return <div className="text-center py-20 text-gray-400">{t.common.loading}</div>;
-  }
+  if (loading) return <div className="text-center py-20 text-gray-400">{t.common.loading}</div>;
   if (!product) return null;
 
   const tool = toolColors[product.tool] ?? toolColors.other;
+  const title = localTitle(product, locale);
+  const desc = localDescription(product, locale);
+  const avail = seller ? AVAILABILITY_STYLE[seller.availability] : null;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
@@ -50,8 +65,8 @@ export default function ProductPage() {
               </span>
               <span className="text-xs text-gray-400">{product.category}</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">{product.title}</h1>
-            <p className="text-gray-600 leading-relaxed">{product.description}</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">{title}</h1>
+            <p className="text-gray-600 leading-relaxed">{desc}</p>
           </div>
 
           {/* Tags */}
@@ -100,31 +115,32 @@ export default function ProductPage() {
               </a>
             )}
 
-            <div className="mt-5 pt-4 border-t border-gray-100 space-y-3">
-              {/* Author */}
-              <div className="flex items-center gap-3">
+            {/* Seller */}
+            <div className="mt-5 pt-4 border-t border-gray-100">
+              <div className="text-xs text-gray-400 mb-2">{t.product.author}</div>
+              <Link href={`/users/${product.author.login}`} className="flex items-start gap-3 hover:opacity-80 transition-opacity">
                 <Image
-                  src={product.author.avatar}
+                  src={seller?.avatar ?? product.author.avatar}
                   alt={product.author.name}
-                  width={36}
-                  height={36}
-                  className="rounded-full"
+                  width={44}
+                  height={44}
+                  className="rounded-full flex-shrink-0"
                   unoptimized
                 />
-                <div>
-                  <div className="text-xs text-gray-400">{t.product.author}</div>
-                  <a
-                    href={product.author.githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm font-medium text-gray-900 hover:text-purple-600"
-                  >
-                    {product.author.name}
-                  </a>
+                <div className="min-w-0">
+                  <div className="font-medium text-gray-900 text-sm flex items-center gap-2">
+                    {seller?.displayName ?? product.author.name}
+                    {avail && (
+                      <span className={`text-xs px-1.5 py-0.5 rounded-full ${avail.cls}`}>{avail.label}</span>
+                    )}
+                  </div>
+                  {seller?.catchphrase && (
+                    <div className="text-xs text-gray-500 mt-0.5 line-clamp-1">{seller.catchphrase}</div>
+                  )}
                 </div>
-              </div>
+              </Link>
 
-              <div className="grid grid-cols-2 gap-3 text-center">
+              <div className="grid grid-cols-2 gap-3 text-center mt-4">
                 <div className="bg-gray-50 rounded-lg p-2">
                   <div className="text-lg font-bold text-gray-900">⭐ {product.stars}</div>
                   <div className="text-xs text-gray-400">{t.product.stars}</div>

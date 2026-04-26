@@ -12,14 +12,18 @@ export async function GET(req: NextRequest) {
   const category = searchParams.get("category");
   const q = searchParams.get("q")?.toLowerCase();
   const sort = searchParams.get("sort") ?? "newest";
+  const author = searchParams.get("author"); // filter by author login
 
   let filtered = products;
   if (tool && tool !== "all") filtered = filtered.filter((p) => p.tool === tool);
   if (category) filtered = filtered.filter((p) => p.category === category);
+  if (author) filtered = filtered.filter((p) => p.author.login === author);
   if (q) {
     filtered = filtered.filter(
       (p) =>
         p.title.toLowerCase().includes(q) ||
+        (p.title_en ?? "").toLowerCase().includes(q) ||
+        (p.title_zh ?? "").toLowerCase().includes(q) ||
         p.description.toLowerCase().includes(q) ||
         p.tags.some((t) => t.toLowerCase().includes(q))
     );
@@ -46,7 +50,8 @@ export async function POST(req: NextRequest) {
     ...body,
     id: uuidv4(),
     author: {
-      name: login,
+      name: session.user.name ?? login,
+      login,
       githubUrl: profileUrl,
       avatar: session.user.image ?? "",
     },

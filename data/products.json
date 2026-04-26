@@ -3,13 +3,18 @@
     {
       "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "title": "Gitワークフロー自動化スキル",
+      "title_en": "Git Workflow Automation Skill",
+      "title_zh": "Git工作流自动化技能",
       "description": "Gitの操作を包括的に自動化するスキルです。ブランチ戦略、コミットメッセージ規約（Conventional Commits）、PRテンプレート自動生成、コンフリクト解決支援など、チーム開発を効率化する機能を網羅しています。",
+      "description_en": "A comprehensive skill for automating Git operations. Covers branch strategies, commit message conventions (Conventional Commits), PR template generation, conflict resolution, and more to boost team development efficiency.",
+      "description_zh": "全面自动化Git操作的技能包。涵盖分支策略、提交消息规范（Conventional Commits）、PR模板自动生成、冲突解决辅助等功能，提升团队开发效率。",
       "price": 0,
       "tool": "claude-code",
       "category": "開発ツール・環境",
       "tags": ["git", "workflow", "automation", "devops", "conventional-commits"],
       "author": {
         "name": "Skills Market 公式",
+        "login": "skills-market",
         "githubUrl": "https://github.com/chakottihero",
         "avatar": "https://avatars.githubusercontent.com/u/197975374?v=4"
       },
@@ -23,13 +28,18 @@
     {
       "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
       "title": "Next.js フルスタック開発アシスタント",
+      "title_en": "Next.js Full-Stack Development Assistant",
+      "title_zh": "Next.js全栈开发助手",
       "description": "Next.js App Routerを使ったフルスタック開発を強力にサポートするスキルです。TypeScript型定義の自動生成、Tailwind CSSのコンポーネント提案、Prismaスキーマ設計、NextAuth.js認証設定まで一貫してカバーします。",
+      "description_en": "A powerful skill for full-stack development with Next.js App Router. Covers automatic TypeScript type generation, Tailwind CSS component suggestions, Prisma schema design, and NextAuth.js authentication setup.",
+      "description_zh": "强力支持Next.js App Router全栈开发的技能包。涵盖TypeScript类型自动生成、Tailwind CSS组件建议、Prisma架构设计以及NextAuth.js认证配置。",
       "price": 980,
       "tool": "claude-code",
       "category": "Webフロントエンド",
       "tags": ["nextjs", "typescript", "tailwind", "prisma", "nextauth", "fullstack"],
       "author": {
         "name": "Skills Market 公式",
+        "login": "skills-market",
         "githubUrl": "https://github.com/chakottihero",
         "avatar": "https://avatars.githubusercontent.com/u/197975374?v=4"
       },
@@ -43,13 +53,18 @@
     {
       "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
       "title": "Pythonコード品質改善スキル",
+      "title_en": "Python Code Quality Improvement Skill",
+      "title_zh": "Python代码质量改善技能",
       "description": "Pythonコードのリファクタリング、型ヒント追加、テスト生成を自動化するスキルです。flake8/mypy/pytestと連携し、コードの品質を継続的に改善します。FastAPI・Django・データサイエンスプロジェクトに対応。",
+      "description_en": "A skill that automates Python code refactoring, type hint addition, and test generation. Works with flake8/mypy/pytest to continuously improve code quality. Supports FastAPI, Django, and data science projects.",
+      "description_zh": "自动化Python代码重构、类型提示添加和测试生成的技能包。与flake8/mypy/pytest协作，持续提升代码质量。支持FastAPI、Django和数据科学项目。",
       "price": 490,
       "tool": "cursor",
       "category": "コード品質・レビュー",
       "tags": ["python", "refactoring", "testing", "mypy", "fastapi", "django"],
       "author": {
         "name": "Skills Market 公式",
+        "login": "skills-market",
         "githubUrl": "https://github.com/chakottihero",
         "avatar": "https://avatars.githubusercontent.com/u/197975374?v=4"
       },
@@ -63,13 +78,18 @@
     {
       "id": "d4e5f6a7-b8c9-0123-defa-234567890123",
       "title": "AIセキュリティ診断＆コードレビュースキル",
+      "title_en": "AI Security Analysis & Code Review Skill",
+      "title_zh": "AI安全诊断与代码审查技能",
       "description": "コードのセキュリティ脆弱性を自動検出するスキルです。OWASP Top 10に基づくチェック、SQLインジェクション・XSS・認証不備などのリスクを指摘し、具体的な修正コードを提案します。GitHub PR連携対応。",
-      "price": 1,
+      "description_en": "A skill that automatically detects security vulnerabilities in code. Checks based on OWASP Top 10, identifies risks like SQL injection, XSS, and auth flaws, and suggests concrete fixes. Integrates with GitHub PRs.",
+      "description_zh": "自动检测代码安全漏洞的技能包。基于OWASP Top 10进行检查，识别SQL注入、XSS、认证缺陷等风险，并提供具体修复代码建议。支持GitHub PR集成。",
+      "price": 1480,
       "tool": "copilot",
       "category": "コード品質・レビュー",
       "tags": ["security", "owasp", "code-review", "vulnerability", "github", "pr"],
       "author": {
         "name": "Skills Market 公式",
+        "login": "skills-market",
         "githubUrl": "https://github.com/chakottihero",
         "avatar": "https://avatars.githubusercontent.com/u/197975374?v=4"
       },
@@ -83,13 +103,18 @@
     {
       "id": "e5f6a7b8-c9d0-1234-efab-345678901234",
       "title": "TypeScript型安全API開発スキル",
+      "title_en": "TypeScript Type-Safe API Development Skill",
+      "title_zh": "TypeScript类型安全API开发技能",
       "description": "TypeScriptを使ったAPI開発を型安全に進めるためのスキルです。OpenAPIスキーマからの型生成、zodバリデーション設計、tRPCの設定支援など、型エラーゼロのAPIを効率よく構築できます。",
+      "description_en": "A skill for building type-safe APIs with TypeScript. Generates types from OpenAPI schemas, designs zod validation, and supports tRPC configuration — enabling zero-type-error API development efficiently.",
+      "description_zh": "使用TypeScript构建类型安全API的技能包。从OpenAPI模式生成类型、设计zod验证，以及支持tRPC配置——高效实现零类型错误的API开发。",
       "price": 780,
       "tool": "codex",
       "category": "バックエンド・API",
       "tags": ["typescript", "api", "zod", "trpc", "openapi", "validation"],
       "author": {
         "name": "Skills Market 公式",
+        "login": "skills-market",
         "githubUrl": "https://github.com/chakottihero",
         "avatar": "https://avatars.githubusercontent.com/u/197975374?v=4"
       },

@@ -1,0 +1,36 @@
+{
+  "users": [
+    {
+      "username": "skills-market",
+      "displayName": "Skills Market 公式",
+      "avatar": "https://avatars.githubusercontent.com/u/197975374?v=4",
+      "coverImage": "",
+      "catchphrase": "AIスキルのプラットフォーム運営チーム",
+      "bio": "## Skills Market 公式アカウント\n\nAIエージェント向けスキル（SKILL.md）のマーケットプレイスを運営しています。\n\nClaude Code、Cursor、Copilot、Codexなど各種AIツール向けの高品質なスキルパッケージを厳選して提供します。\n\n### 提供スキルの特徴\n- 実際の開発現場で検証済みのスキル\n- 詳細なドキュメントと使用例付き\n- 定期的なアップデートと品質保証",
+      "specialties": ["Webフロントエンド", "バックエンド・API", "AI・機械学習", "開発ツール・環境", "コード品質・レビュー"],
+      "supportedTools": ["claude-code", "cursor", "copilot", "codex"],
+      "skills": ["Next.js", "TypeScript", "Python", "AI/ML", "DevOps", "Security"],
+      "experience": {
+        "work": [],
+        "education": [],
+        "awards": []
+      },
+      "portfolio": [
+        {
+          "url": "https://skill-search-ten.vercel.app",
+          "title": "Skill Search",
+          "description": "74,000件以上のAIスキルを検索できるプラットフォーム"
+        }
+      ],
+      "availability": "available",
+      "schedule": "随時対応可能",
+      "sns": {
+        "github": "https://github.com/chakottihero",
+        "twitter": "",
+        "other": ""
+      },
+      "createdAt": "2026-04-01T00:00:00Z",
+      "updatedAt": "2026-04-01T00:00:00Z"
+    }
+  ]
+}
