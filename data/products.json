@@ -1,0 +1,104 @@
+{
+  "products": [
+    {
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "title": "Git Workflow Master",
+      "description": "Comprehensive Git workflow automation skill covering branching strategies, commit conventions, PR templates, and conflict resolution. Includes hooks for pre-commit linting and auto-changelog generation.",
+      "price": 0,
+      "tool": "claude-code",
+      "category": "開発ツール・環境",
+      "tags": ["git", "workflow", "automation", "devops"],
+      "author": {
+        "name": "techdev42",
+        "githubUrl": "https://github.com/techdev42",
+        "avatar": "https://avatars.githubusercontent.com/u/1?v=4"
+      },
+      "content": "# Git Workflow Master\n\nAutomates your entire Git workflow including:\n- Conventional commit enforcement\n- Auto PR description generation\n- Branch naming conventions\n- Merge conflict resolution assistance\n\n## Usage\nThis skill activates on any git-related commands and provides structured guidance.",
+      "repoUrl": "https://github.com/techdev42/git-workflow-skill",
+      "stars": 142,
+      "purchases": 389,
+      "createdAt": "2026-01-15T08:00:00Z",
+      "lang": "en"
+    },
+    {
+      "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "title": "Next.js フルスタック開発アシスタント",
+      "description": "Next.js App Routerを使ったフルスタック開発を支援するスキル。TypeScript、Tailwind CSS、Prisma、NextAuth.jsの統合から、デプロイまで完全サポート。",
+      "price": 980,
+      "tool": "claude-code",
+      "category": "Webフロントエンド",
+      "tags": ["nextjs", "typescript", "tailwind", "prisma", "fullstack"],
+      "author": {
+        "name": "jpdevmaster",
+        "githubUrl": "https://github.com/jpdevmaster",
+        "avatar": "https://avatars.githubusercontent.com/u/2?v=4"
+      },
+      "content": "# Next.js フルスタック開発アシスタント\n\n## 機能\n- App Routerのベストプラクティス自動適用\n- TypeScript型定義の自動生成\n- Tailwind CSSコンポーネントの提案\n- Prismaスキーマ設計支援\n- NextAuth.js認証設定\n\n## 使い方\nNext.jsプロジェクトのルートに配置するだけで自動的に有効化されます。",
+      "repoUrl": "https://github.com/jpdevmaster/nextjs-fullstack-skill",
+      "stars": 87,
+      "purchases": 156,
+      "createdAt": "2026-02-01T10:00:00Z",
+      "lang": "ja"
+    },
+    {
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+      "title": "Python量化交易策略框架",
+      "description": "为量化交易设计的AI技能包，支持A股、港股、期货市场分析。包含技术指标计算、回测框架、风险管理模块，以及与主流交易API的集成。",
+      "price": 2980,
+      "tool": "cursor",
+      "category": "金融・経済",
+      "tags": ["python", "trading", "quant", "backtest", "stock", "china"],
+      "author": {
+        "name": "quantpro_cn",
+        "githubUrl": "https://github.com/quantpro_cn",
+        "avatar": "https://avatars.githubusercontent.com/u/3?v=4"
+      },
+      "content": "# Python量化交易策略框架\n\n## 功能模块\n- **技术指标**: MA, MACD, RSI, Bollinger Bands等50+指标\n- **回测引擎**: 支持A股/港股历史数据回测\n- **风险管理**: VaR计算、最大回撤控制\n- **实盘对接**: 同花顺、东方财富API集成\n\n## 快速开始\n安装后在Cursor中打开量化项目，AI会自动识别并提供策略建议。",
+      "repoUrl": "https://github.com/quantpro_cn/quant-trading-skill",
+      "stars": 234,
+      "purchases": 89,
+      "createdAt": "2026-02-20T12:00:00Z",
+      "lang": "zh"
+    },
+    {
+      "id": "d4e5f6a7-b8c9-0123-defa-234567890123",
+      "title": "Code Review Copilot Pro",
+      "description": "Advanced code review skill that checks for security vulnerabilities, performance issues, and code quality. Integrates with GitHub PRs and provides detailed feedback with fix suggestions.",
+      "price": 490,
+      "tool": "copilot",
+      "category": "コード品質・レビュー",
+      "tags": ["code-review", "security", "performance", "github", "pr"],
+      "author": {
+        "name": "codereviewer99",
+        "githubUrl": "https://github.com/codereviewer99",
+        "avatar": "https://avatars.githubusercontent.com/u/4?v=4"
+      },
+      "content": "# Code Review Copilot Pro\n\nAutomatic code review covering:\n- **Security**: OWASP Top 10, SQL injection, XSS detection\n- **Performance**: N+1 queries, memory leaks, algorithmic complexity\n- **Quality**: Code smells, duplication, naming conventions\n- **Documentation**: Missing JSDoc, API contracts\n\n## Integration\nWorks seamlessly with GitHub Copilot in VS Code and JetBrains IDEs.",
+      "repoUrl": "https://github.com/codereviewer99/code-review-pro-skill",
+      "stars": 312,
+      "purchases": 567,
+      "createdAt": "2026-01-28T09:00:00Z",
+      "lang": "en"
+    },
+    {
+      "id": "e5f6a7b8-c9d0-1234-efab-345678901234",
+      "title": "OpenAI Codex APIインテグレーター",
+      "description": "OpenAI Codex APIを活用した高度なコード生成・補完スキル。複数言語対応、コンテキスト理解、自動テスト生成機能を搭載。エンタープライズ向けセキュリティ設定も完備。",
+      "price": 1480,
+      "tool": "codex",
+      "category": "AI・機械学習",
+      "tags": ["openai", "codex", "api", "code-generation", "testing"],
+      "author": {
+        "name": "aiintegrator_jp",
+        "githubUrl": "https://github.com/aiintegrator_jp",
+        "avatar": "https://avatars.githubusercontent.com/u/5?v=4"
+      },
+      "content": "# OpenAI Codex APIインテグレーター\n\n## 主な機能\n- マルチ言語コード生成（Python/TS/Go/Rust）\n- インテリジェントなコンテキスト理解\n- 自動ユニットテスト生成\n- APIドキュメント自動作成\n- エンタープライズSSO対応\n\n## 対応環境\nVS Code、JetBrains、CLI環境すべてで動作します。",
+      "repoUrl": "https://github.com/aiintegrator_jp/codex-integrator-skill",
+      "stars": 56,
+      "purchases": 34,
+      "createdAt": "2026-03-05T14:00:00Z",
+      "lang": "ja"
+    }
+  ]
+}
