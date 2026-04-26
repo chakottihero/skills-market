@@ -4,7 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import ProductCard from "@/components/ProductCard";
 import { useLanguage } from "@/components/LanguageContext";
 import { CATEGORIES, getCategoryName } from "@/lib/categories";
-import { TOOLS } from "@/lib/tools";
+import { TOOLS, TOOL_MAP } from "@/lib/tools";
 import type { Product } from "@/types";
 
 export default function SkillsPage() {
@@ -22,11 +22,11 @@ function SkillsPageInner() {
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [query, setQuery]       = useState(searchParams.get("q") ?? "");
-  const [category, setCategory] = useState(searchParams.get("category") ?? "");
-  const [tool, setTool]         = useState(searchParams.get("tool") ?? "");
+  const [query, setQuery]         = useState(searchParams.get("q") ?? "");
+  const [category, setCategory]   = useState(searchParams.get("category") ?? "");
+  const [tool, setTool]           = useState(searchParams.get("tool") ?? "");
   const [priceType, setPriceType] = useState(searchParams.get("price_type") ?? "");
-  const [sort, setSort]         = useState(searchParams.get("sort") ?? "newest");
+  const [sort, setSort]           = useState(searchParams.get("sort") ?? "newest");
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -46,7 +46,6 @@ function SkillsPageInner() {
     return () => clearTimeout(id);
   }, [fetchProducts]);
 
-  // sync URL
   useEffect(() => {
     const p = new URLSearchParams();
     if (query)     p.set("q", query);
@@ -63,68 +62,163 @@ function SkillsPageInner() {
     { value: "paid", label: t.skills.pricePaid },
   ];
 
+  const SORT_OPTIONS = [
+    { value: "newest",  label: t.skills.sortNewest },
+    { value: "popular", label: t.skills.sortPopular },
+    { value: "price",   label: t.skills.sortPrice },
+  ];
+
+  const chipCls = (val: string, active: string) =>
+    `flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors whitespace-nowrap ${
+      val === active
+        ? "bg-purple-600 text-white border-purple-600"
+        : "bg-white text-gray-600 border-gray-200 hover:border-purple-300"
+    }`;
+
+  const hasActiveFilters = !!(category || tool || priceType);
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">{t.skills.title}</h1>
 
-      {/* Free/Paid tabs */}
-      <div className="flex gap-1 mb-5 bg-gray-100 rounded-lg p-1 w-fit">
-        {PRICE_TABS.map(({ value, label }) => (
-          <button
-            key={value}
-            onClick={() => setPriceType(value)}
-            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
-              priceType === value
-                ? "bg-white text-purple-700 shadow-sm"
-                : "text-gray-500 hover:text-gray-800"
-            }`}
+      {/* Filter card */}
+      <div className="bg-white rounded-xl border border-gray-200 p-4 mb-4 space-y-3">
+
+        {/* Row 1: Search + Sort (desktop sort shown here) */}
+        <div className="flex gap-3">
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t.skills.searchPlaceholder}
+            className="flex-1 border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+          />
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+            className="hidden sm:block border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white"
           >
-            {label}
-          </button>
-        ))}
+            {SORT_OPTIONS.map(({ value, label }) => (
+              <option key={value} value={value}>{label}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Row 2: Category + Tool + Price tabs — desktop only */}
+        <div className="hidden sm:flex gap-3 items-center flex-wrap">
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white"
+          >
+            <option value="">{t.skills.allCategories}</option>
+            {CATEGORIES.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.icon} {getCategoryName(cat.id, locale)}
+              </option>
+            ))}
+          </select>
+          <select
+            value={tool}
+            onChange={(e) => setTool(e.target.value)}
+            className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white"
+          >
+            <option value="">{t.skills.allTools}</option>
+            {TOOLS.map((tk) => (
+              <option key={tk.id} value={tk.id}>{tk.name}</option>
+            ))}
+          </select>
+          <div className="flex gap-1 ml-auto bg-gray-100 rounded-lg p-1">
+            {PRICE_TABS.map(({ value, label }) => (
+              <button
+                key={value}
+                onClick={() => setPriceType(value)}
+                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                  priceType === value
+                    ? "bg-white text-purple-700 shadow-sm"
+                    : "text-gray-500 hover:text-gray-800"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Mobile: horizontal chip scroll rows */}
+        <div className="sm:hidden space-y-2">
+          {/* Price + Sort */}
+          <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+            {PRICE_TABS.map(({ value, label }) => (
+              <button key={value} onClick={() => setPriceType(value)} className={chipCls(value, priceType)}>
+                {label}
+              </button>
+            ))}
+            <span className="flex-shrink-0 w-px bg-gray-200 self-stretch mx-1" />
+            {SORT_OPTIONS.map(({ value, label }) => (
+              <button key={value} onClick={() => setSort(value)} className={chipCls(value, sort)}>
+                {label}
+              </button>
+            ))}
+          </div>
+          {/* Category */}
+          <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+            <button onClick={() => setCategory("")} className={chipCls("", category)}>
+              {t.skills.allCategories}
+            </button>
+            {CATEGORIES.map((cat) => (
+              <button key={cat.id} onClick={() => setCategory(cat.id)} className={chipCls(cat.id, category)}>
+                {cat.icon} {getCategoryName(cat.id, locale)}
+              </button>
+            ))}
+          </div>
+          {/* Tool */}
+          <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+            <button onClick={() => setTool("")} className={chipCls("", tool)}>
+              {t.skills.allTools}
+            </button>
+            {TOOLS.map((tk) => (
+              <button key={tk.id} onClick={() => setTool(tk.id)} className={chipCls(tk.id, tool)}>
+                {tk.name}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-8">
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder={t.skills.searchPlaceholder}
-          className="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
-        />
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white"
-        >
-          <option value="">{t.skills.allCategories}</option>
-          {CATEGORIES.map((cat) => (
-            <option key={cat.id} value={cat.id}>
-              {cat.icon} {getCategoryName(cat.id, locale)}
-            </option>
-          ))}
-        </select>
-        <select
-          value={tool}
-          onChange={(e) => setTool(e.target.value)}
-          className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white"
-        >
-          <option value="">{t.skills.allTools}</option>
-          {TOOLS.map((tk) => (
-            <option key={tk.id} value={tk.id}>{tk.name}</option>
-          ))}
-        </select>
-        <select
-          value={sort}
-          onChange={(e) => setSort(e.target.value)}
-          className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white"
-        >
-          <option value="newest">{t.skills.sortNewest}</option>
-          <option value="popular">{t.skills.sortPopular}</option>
-          <option value="price">{t.skills.sortPrice}</option>
-        </select>
-      </div>
+      {/* Active filter tags */}
+      {hasActiveFilters && (
+        <div className="flex flex-wrap gap-2 mb-4 items-center">
+          <span className="text-xs text-gray-500">{t.filter.activeFilters}:</span>
+          {category && (
+            <button
+              onClick={() => setCategory("")}
+              className="flex items-center gap-1 text-xs bg-purple-100 text-purple-700 px-2.5 py-1 rounded-full hover:bg-purple-200 transition-colors"
+            >
+              {getCategoryName(category, locale)}
+              <span className="text-purple-400 ml-0.5">×</span>
+            </button>
+          )}
+          {tool && (
+            <button
+              onClick={() => setTool("")}
+              className="flex items-center gap-1 text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full hover:bg-blue-200 transition-colors"
+            >
+              {TOOL_MAP[tool as keyof typeof TOOL_MAP]?.name ?? tool}
+              <span className="text-blue-400 ml-0.5">×</span>
+            </button>
+          )}
+          {priceType && (
+            <button
+              onClick={() => setPriceType("")}
+              className="flex items-center gap-1 text-xs bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full hover:bg-emerald-200 transition-colors"
+            >
+              {priceType === "free" ? t.skills.priceFree : t.skills.pricePaid}
+              <span className="text-emerald-400 ml-0.5">×</span>
+            </button>
+          )}
+        </div>
+      )}
 
       {loading ? (
         <div className="text-center text-gray-400 py-20">{t.common.loading}</div>
@@ -132,7 +226,9 @@ function SkillsPageInner() {
         <div className="text-center text-gray-400 py-20">{t.skills.noResults}</div>
       ) : (
         <>
-          <p className="text-sm text-gray-500 mb-4">{products.length} results</p>
+          <p className="text-sm text-gray-500 mb-4">
+            {t.filter.results.replace("{count}", String(products.length))}
+          </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {products.map((p) => (
               <ProductCard key={p.id} product={p} />

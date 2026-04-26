@@ -33,11 +33,15 @@ export default function ProductCard({ product }: { product: Product }) {
               </span>
             )}
           </div>
-          <span className="text-sm font-bold text-gray-900 ml-2 flex-shrink-0">
+          <span className="ml-2 flex-shrink-0">
             {product.price_type === "free" || product.price === 0 ? (
-              <span className="text-emerald-600">{t.common.free}</span>
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">
+                {t.common.free}
+              </span>
             ) : (
-              `¥${product.price.toLocaleString()}`
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-900 text-white">
+                ¥{product.price.toLocaleString()}
+              </span>
             )}
           </span>
         </div>

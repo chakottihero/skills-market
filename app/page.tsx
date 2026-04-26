@@ -59,9 +59,18 @@ export default function HomePage() {
       <section className="bg-white border-b border-gray-200 py-10">
         <div className="max-w-4xl mx-auto px-4 grid grid-cols-3 gap-8 text-center">
           {[
-            { value: stats.skills > 0 ? `${stats.skills}件` : "—", label: t.home.totalSkills },
-            { value: stats.sellers > 0 ? `${stats.sellers}人` : "—", label: t.home.totalSellers },
-            { value: `${stats.purchases}件`, label: t.home.totalPurchases },
+            {
+              value: stats.skills > 0 ? `${stats.skills.toLocaleString()}${t.stats.unit.skills}` : "—",
+              label: t.stats.skillsListed,
+            },
+            {
+              value: stats.sellers > 0 ? `${stats.sellers.toLocaleString()}${t.stats.unit.people}` : "—",
+              label: t.stats.sellers,
+            },
+            {
+              value: `${stats.purchases.toLocaleString()}${t.stats.unit.purchases}`,
+              label: t.stats.totalPurchases,
+            },
           ].map(({ value, label }) => (
             <div key={label}>
               <div className="text-3xl font-bold text-purple-600">{value}</div>
@@ -72,18 +81,20 @@ export default function HomePage() {
       </section>
 
       {/* Skill Search Banner */}
-      <section className="bg-indigo-50 border-b border-indigo-100 py-6 px-4">
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <section className="bg-gradient-to-r from-purple-900 via-purple-800 to-indigo-900 py-12 px-4">
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
           <div>
-            <p className="text-sm font-medium text-indigo-700">🔍 {t.home.searchHero}</p>
+            <p className="text-purple-300 text-sm font-medium mb-1">🔍 Skill Search</p>
+            <div className="text-2xl font-bold text-white mb-1">74,000+</div>
+            <p className="text-purple-200 text-sm">{t.home.searchHero}</p>
           </div>
           <a
             href="https://skill-search-ten.vercel.app"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm bg-indigo-600 text-white px-5 py-2 rounded-full hover:bg-indigo-700 transition-colors whitespace-nowrap"
+            className="flex-shrink-0 bg-gradient-to-r from-purple-500 to-blue-500 text-white font-semibold px-8 py-3 rounded-full hover:opacity-90 transition-opacity whitespace-nowrap text-base shadow-lg"
           >
-            Skill Search →
+            Explore Skill Search →
           </a>
         </div>
       </section>

@@ -150,6 +150,16 @@ const translations = {
       noSkills: "まだスキルが出品されていません",
       contact: "連絡する",
     },
+    stats: {
+      skillsListed: "登録スキル数",
+      sellers: "出品者数",
+      totalPurchases: "累計購入数",
+      unit: { skills: "件", people: "人", purchases: "件" },
+    },
+    filter: {
+      results: "{count}件の結果",
+      activeFilters: "適用中のフィルター",
+    },
   },
   en: {
     nav: {
@@ -297,6 +307,16 @@ const translations = {
       sellerSkills: "Skills by this seller",
       noSkills: "No skills listed yet",
       contact: "Contact",
+    },
+    stats: {
+      skillsListed: "Skills Listed",
+      sellers: "Sellers",
+      totalPurchases: "Total Purchases",
+      unit: { skills: "", people: "", purchases: "" },
+    },
+    filter: {
+      results: "{count} results",
+      activeFilters: "Active Filters",
     },
   },
   zh: {
@@ -446,6 +466,16 @@ const translations = {
       noSkills: "暂无上架技能",
       contact: "联系",
     },
+    stats: {
+      skillsListed: "已注册技能",
+      sellers: "卖家数",
+      totalPurchases: "累计购买",
+      unit: { skills: "个", people: "人", purchases: "次" },
+    },
+    filter: {
+      results: "{count} 个结果",
+      activeFilters: "当前筛选",
+    },
   },
 } as const;
 
@@ -461,6 +491,8 @@ export type Translations = {
   profile: { title: string; save: string; saved: string; avatar: string; coverImage: string; displayName: string; catchphrase: string; bio: string; specialties: string; supportedTools: string; skills: string; experience: string; work: string; education: string; awards: string; portfolio: string; availability: string; schedule: string; sns: string; viewPublic: string; addWork: string; addEducation: string; addAward: string; addPortfolio: string; company: string; role: string; period: string; description: string; school: string; major: string; awardTitle: string; year: string; url: string; delete: string };
   availability: { available: string; depends: string; busy: string };
   publicProfile: { sellerSkills: string; noSkills: string; contact: string };
+  stats: { skillsListed: string; sellers: string; totalPurchases: string; unit: { skills: string; people: string; purchases: string } };
+  filter: { results: string; activeFilters: string };
 };
 
 export function getTranslations(locale: Locale): Translations {
