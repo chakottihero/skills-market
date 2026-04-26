@@ -8,11 +8,18 @@ import type { Product } from "@/types";
 export default function HomePage() {
   const { t } = useLanguage();
   const [featured, setFeatured] = useState<Product[]>([]);
+  const [stats, setStats] = useState({ skills: 0, sellers: 0, purchases: 0 });
 
   useEffect(() => {
     fetch("/api/products?sort=popular")
       .then((r) => r.json())
-      .then((d) => setFeatured((d.products as Product[]).slice(0, 4)));
+      .then((d) => {
+        const products = d.products as Product[];
+        setFeatured(products.slice(0, 4));
+        const uniqueSellers = new Set(products.map((p) => p.author.name)).size;
+        const totalPurchases = products.reduce((sum, p) => sum + p.purchases, 0);
+        setStats({ skills: products.length, sellers: uniqueSellers, purchases: totalPurchases });
+      });
   }, []);
 
   return (
@@ -48,9 +55,9 @@ export default function HomePage() {
       <section className="bg-white border-b border-gray-200 py-10">
         <div className="max-w-4xl mx-auto px-4 grid grid-cols-3 gap-8 text-center">
           {[
-            { value: "5+", label: t.home.totalSkills },
-            { value: "3+", label: t.home.totalSellers },
-            { value: "1,235", label: t.home.totalPurchases },
+            { value: stats.skills > 0 ? `${stats.skills}件` : "—", label: t.home.totalSkills },
+            { value: stats.sellers > 0 ? `${stats.sellers}人` : "—", label: t.home.totalSellers },
+            { value: `${stats.purchases}件`, label: t.home.totalPurchases },
           ].map(({ value, label }) => (
             <div key={label}>
               <div className="text-3xl font-bold text-purple-600">{value}</div>
