@@ -24,7 +24,12 @@ export async function GET(req: NextRequest) {
         p.title.toLowerCase().includes(q) ||
         (p.title_en ?? "").toLowerCase().includes(q) ||
         (p.title_zh ?? "").toLowerCase().includes(q) ||
+        p.shortDescription.toLowerCase().includes(q) ||
+        (p.shortDescription_en ?? "").toLowerCase().includes(q) ||
+        (p.shortDescription_zh ?? "").toLowerCase().includes(q) ||
         p.description.toLowerCase().includes(q) ||
+        (p.description_en ?? "").toLowerCase().includes(q) ||
+        (p.description_zh ?? "").toLowerCase().includes(q) ||
         p.tags.some((t) => t.toLowerCase().includes(q))
     );
   }

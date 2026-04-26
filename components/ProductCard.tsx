@@ -4,13 +4,13 @@ import Image from "next/image";
 import type { Product } from "@/types";
 import { toolColors } from "@/lib/toolColors";
 import { useLanguage } from "./LanguageContext";
-import { localTitle, localDescription } from "@/lib/localizeProduct";
+import { localTitle, localShortDescription } from "@/lib/localizeProduct";
 
 export default function ProductCard({ product }: { product: Product }) {
   const { t, locale } = useLanguage();
   const tool = toolColors[product.tool] ?? toolColors.other;
   const title = localTitle(product, locale);
-  const desc = localDescription(product, locale);
+  const desc = localShortDescription(product, locale);
 
   return (
     <Link href={`/skills/${product.id}`} className="block group">

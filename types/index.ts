@@ -14,6 +14,9 @@ export interface Product {
   title: string;
   title_en?: string;
   title_zh?: string;
+  shortDescription: string;
+  shortDescription_en?: string;
+  shortDescription_zh?: string;
   description: string;
   description_en?: string;
   description_zh?: string;
