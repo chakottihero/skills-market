@@ -20,9 +20,10 @@ export const authOptions: NextAuthOptions = {
         }),
       ]
     : [],
+  // pages.signIn を削除: カスタム signIn ページへのルーティングが
+  // state パラメータの不一致を引き起こすため除去する
   pages: {
     error: "/auth/error",
-    signIn: "/auth/signin",
   },
   callbacks: {
     async session({ session, token }) {

@@ -24,7 +24,8 @@ export default function Navbar() {
         showToast("GitHub OAuth 未設定です。管理者に連絡してください。");
         return;
       }
-      signIn("github");
+      // callbackUrl を明示してリダイレクト先を確実にする
+      signIn("github", { callbackUrl: "/" });
     } catch {
       showToast("エラーが発生しました。しばらくお待ちください。");
     }
