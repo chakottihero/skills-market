@@ -12,7 +12,7 @@ import type { Product, UserProfile, Availability } from "@/types";
 
 const AVAILABILITY_STYLE: Record<Availability, { label: string; cls: string }> = {
   available: { label: "対応可能", cls: "bg-emerald-100 text-emerald-700" },
-  depends:   { label: "内容による", cls: "bg-amber-100 text-amber-700" },
+  closed:    { label: "受付停止", cls: "bg-gray-100 text-gray-500" },
   busy:      { label: "多忙", cls: "bg-red-100 text-red-700" },
 };
 

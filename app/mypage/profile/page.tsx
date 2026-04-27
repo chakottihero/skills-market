@@ -25,8 +25,8 @@ const TOOLS: { value: Tool; label: string }[] = [
 
 const AVAIL: { value: Availability; label: string; cls: string }[] = [
   { value: "available", label: "対応可能", cls: "bg-emerald-100 text-emerald-700 border-emerald-300" },
-  { value: "depends",   label: "内容による", cls: "bg-amber-100 text-amber-700 border-amber-300" },
-  { value: "busy",      label: "多忙",    cls: "bg-red-100 text-red-700 border-red-300" },
+  { value: "busy",      label: "多忙",     cls: "bg-amber-100 text-amber-700 border-amber-300" },
+  { value: "closed",    label: "受付停止", cls: "bg-red-100 text-red-700 border-red-300" },
 ];
 
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -162,7 +162,7 @@ function WorkEditor({ entries, onChange }: { entries: WorkEntry[]; onChange: (v:
   const update = (i: number, f: Partial<WorkEntry>) =>
     onChange(entries.map((e, idx) => idx === i ? { ...e, ...f } : e));
   const remove = (i: number) => onChange(entries.filter((_, idx) => idx !== i));
-  const add = () => onChange([...entries, { company: "", role: "", period: "", description: "" }]);
+  const add = () => onChange([...entries, { company: "", role: "", period: "" }]);
   return (
     <div className="space-y-3">
       {entries.map((e, i) => (
@@ -175,8 +175,6 @@ function WorkEditor({ entries, onChange }: { entries: WorkEntry[]; onChange: (v:
           </div>
           <input placeholder="期間（例: 2022-2024）" value={e.period} onChange={(ev) => update(i, { period: ev.target.value })}
             className="w-full border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400" />
-          <textarea placeholder="説明" value={e.description} onChange={(ev) => update(i, { description: ev.target.value })}
-            rows={2} className="w-full border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400 resize-none" />
           <button onClick={() => remove(i)} className="text-xs text-red-500 hover:text-red-700">削除</button>
         </div>
       ))}
@@ -191,7 +189,7 @@ function EduEditor({ entries, onChange }: { entries: EducationEntry[]; onChange:
   const update = (i: number, f: Partial<EducationEntry>) =>
     onChange(entries.map((e, idx) => idx === i ? { ...e, ...f } : e));
   const remove = (i: number) => onChange(entries.filter((_, idx) => idx !== i));
-  const add = () => onChange([...entries, { school: "", major: "", period: "" }]);
+  const add = () => onChange([...entries, { school: "", detail: "", period: "" }]);
   return (
     <div className="space-y-3">
       {entries.map((e, i) => (
@@ -199,7 +197,7 @@ function EduEditor({ entries, onChange }: { entries: EducationEntry[]; onChange:
           <div className="grid grid-cols-2 gap-2">
             <input placeholder="学校名" value={e.school} onChange={(ev) => update(i, { school: ev.target.value })}
               className="border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400" />
-            <input placeholder="専攻" value={e.major} onChange={(ev) => update(i, { major: ev.target.value })}
+            <input placeholder="詳細（専攻・学位など）" value={e.detail} onChange={(ev) => update(i, { detail: ev.target.value })}
               className="border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400" />
           </div>
           <input placeholder="期間（例: 2018-2022）" value={e.period} onChange={(ev) => update(i, { period: ev.target.value })}
@@ -218,7 +216,7 @@ function AwardEditor({ entries, onChange }: { entries: AwardEntry[]; onChange: (
   const update = (i: number, f: Partial<AwardEntry>) =>
     onChange(entries.map((e, idx) => idx === i ? { ...e, ...f } : e));
   const remove = (i: number) => onChange(entries.filter((_, idx) => idx !== i));
-  const add = () => onChange([...entries, { title: "", year: new Date().getFullYear(), description: "" }]);
+  const add = () => onChange([...entries, { title: "", year: String(new Date().getFullYear()) }]);
   return (
     <div className="space-y-3">
       {entries.map((e, i) => (
@@ -226,11 +224,9 @@ function AwardEditor({ entries, onChange }: { entries: AwardEntry[]; onChange: (
           <div className="grid grid-cols-3 gap-2">
             <input placeholder="タイトル" value={e.title} onChange={(ev) => update(i, { title: ev.target.value })}
               className="col-span-2 border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400" />
-            <input type="number" placeholder="年" value={e.year} onChange={(ev) => update(i, { year: parseInt(ev.target.value) || 0 })}
+            <input placeholder="年" value={e.year} onChange={(ev) => update(i, { year: ev.target.value })}
               className="border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400" />
           </div>
-          <textarea placeholder="説明" value={e.description} onChange={(ev) => update(i, { description: ev.target.value })}
-            rows={2} className="w-full border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400 resize-none" />
           <button onClick={() => remove(i)} className="text-xs text-red-500 hover:text-red-700">削除</button>
         </div>
       ))}
@@ -281,13 +277,13 @@ export default function ProfileEditPage() {
     catchphrase: "",
     bio: "",
     specialties: [],
-    supportedTools: [],
-    skills: [],
-    experience: { work: [], education: [], awards: [] },
+    tools: [],
+    skillTags: [],
+    career: { work: [], education: [], awards: [] },
     portfolio: [],
     availability: "available",
     schedule: "",
-    sns: { github: "", twitter: "", other: "" },
+    sns: { github: "", twitter: "", website: "" },
     createdAt: "",
     updatedAt: "",
   });
@@ -305,7 +301,6 @@ export default function ProfileEditPage() {
     fetch(`/api/users/${login}`)
       .then((r) => {
         if (r.ok) return r.json();
-        // プロフィール未作成なら session から初期値を設定
         setForm((f) => ({
           ...f,
           username: login,
@@ -350,7 +345,7 @@ export default function ProfileEditPage() {
     return <div className="text-center py-20 text-gray-400">{t.common.loading}</div>;
   }
 
-  const toolLabels = Object.fromEntries(TOOLS.map((t) => [t.value, t.label]));
+  const toolLabels = Object.fromEntries(TOOLS.map((tk) => [tk.value, tk.label]));
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
@@ -358,12 +353,12 @@ export default function ProfileEditPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <Link href="/mypage" className="text-sm text-gray-500 hover:text-gray-700">← {t.mypage.title}</Link>
-          <h1 className="text-2xl font-bold text-gray-900 mt-1">{t.profile.title}</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mt-1">{t.profile.edit}</h1>
         </div>
         <div className="flex items-center gap-3">
           {login && (
             <Link href={`/users/${login}`} className="text-sm text-purple-600 hover:underline">
-              公開ページ →
+              {t.profile.viewPublic} →
             </Link>
           )}
           <button
@@ -381,7 +376,6 @@ export default function ProfileEditPage() {
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
           <SectionTitle>基本情報</SectionTitle>
 
-          {/* Avatar preview */}
           <div className="flex items-center gap-4">
             {form.avatar && (
               <Image src={form.avatar} alt="avatar" width={64} height={64} className="rounded-full border" unoptimized />
@@ -392,13 +386,12 @@ export default function ProfileEditPage() {
             </div>
           </div>
 
-          {/* Cover preview */}
           {form.coverImage && (
             <div className="h-24 rounded-lg overflow-hidden bg-gray-100">
               <img src={form.coverImage} alt="cover" className="w-full h-full object-cover" />
             </div>
           )}
-          <Input label={t.profile.coverImage} value={form.coverImage} onChange={(v) => set("coverImage", v)}
+          <Input label={t.profile.coverImage} value={form.coverImage ?? ""} onChange={(v) => set("coverImage", v)}
             placeholder="https://..." />
 
           <Input label={t.profile.displayName} value={form.displayName} onChange={(v) => set("displayName", v)}
@@ -414,12 +407,12 @@ export default function ProfileEditPage() {
           <SectionTitle>スキル・専門分野</SectionTitle>
           <CheckGroup label={t.profile.specialties} options={SPECIALTIES}
             selected={form.specialties} onChange={(v) => set("specialties", v)} max={5} />
-          <CheckGroup label={t.profile.supportedTools}
+          <CheckGroup label={t.profile.tools}
             options={TOOLS.map((x) => x.label)}
-            selected={form.supportedTools.map((v) => toolLabels[v] ?? v)}
-            onChange={(v) => set("supportedTools", v.map((label) => TOOLS.find((t) => t.label === label)?.value ?? label as Tool))}
+            selected={form.tools.map((v) => toolLabels[v] ?? v)}
+            onChange={(v) => set("tools", v.map((label) => TOOLS.find((tk) => tk.label === label)?.value ?? label as Tool))}
           />
-          <TagInput label={t.profile.skills} tags={form.skills} onChange={(v) => set("skills", v)} max={15}
+          <TagInput label={t.profile.skillTags} tags={form.skillTags} onChange={(v) => set("skillTags", v)} max={15}
             placeholder="TypeScript, Next.js, Python..." />
         </div>
 
@@ -441,27 +434,27 @@ export default function ProfileEditPage() {
               ))}
             </div>
           </div>
-          <Input label={t.profile.schedule} value={form.schedule} onChange={(v) => set("schedule", v)}
+          <Input label={t.profile.schedule} value={form.schedule ?? ""} onChange={(v) => set("schedule", v)}
             placeholder="平日18時以降、週末も対応可能" />
         </div>
 
         {/* 経歴 */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6">
-          <SectionTitle>{t.profile.experience}</SectionTitle>
+          <SectionTitle>{t.profile.career}</SectionTitle>
           <div>
             <h3 className="text-sm font-semibold text-gray-700 mb-3">{t.profile.work}</h3>
-            <WorkEditor entries={form.experience.work}
-              onChange={(v) => set("experience", { ...form.experience, work: v })} />
+            <WorkEditor entries={form.career.work}
+              onChange={(v) => set("career", { ...form.career, work: v })} />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-gray-700 mb-3">{t.profile.education}</h3>
-            <EduEditor entries={form.experience.education}
-              onChange={(v) => set("experience", { ...form.experience, education: v })} />
+            <EduEditor entries={form.career.education}
+              onChange={(v) => set("career", { ...form.career, education: v })} />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-gray-700 mb-3">{t.profile.awards}</h3>
-            <AwardEditor entries={form.experience.awards}
-              onChange={(v) => set("experience", { ...form.experience, awards: v })} />
+            <AwardEditor entries={form.career.awards}
+              onChange={(v) => set("career", { ...form.career, awards: v })} />
           </div>
         </div>
 
@@ -474,11 +467,11 @@ export default function ProfileEditPage() {
         {/* SNS */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <SectionTitle>{t.profile.sns}</SectionTitle>
-          <Input label="GitHub" value={form.sns.github} onChange={(v) => set("sns", { ...form.sns, github: v })}
+          <Input label="GitHub" value={form.sns.github ?? ""} onChange={(v) => set("sns", { ...form.sns, github: v })}
             placeholder="https://github.com/username" />
-          <Input label="X (Twitter)" value={form.sns.twitter} onChange={(v) => set("sns", { ...form.sns, twitter: v })}
+          <Input label="X (Twitter)" value={form.sns.twitter ?? ""} onChange={(v) => set("sns", { ...form.sns, twitter: v })}
             placeholder="https://x.com/username" />
-          <Input label="その他URL" value={form.sns.other} onChange={(v) => set("sns", { ...form.sns, other: v })}
+          <Input label="Website" value={form.sns.website ?? ""} onChange={(v) => set("sns", { ...form.sns, website: v })}
             placeholder="https://..." />
         </div>
 

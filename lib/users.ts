@@ -19,7 +19,12 @@ export function getUser(username: string): UserProfile | undefined {
   return readUsers().find((u) => u.username === username);
 }
 
-export function defaultProfile(username: string, displayName: string, avatar: string, githubUrl: string): UserProfile {
+export function defaultProfile(
+  username: string,
+  displayName: string,
+  avatar: string,
+  githubUrl: string
+): UserProfile {
   return {
     username,
     displayName,
@@ -28,15 +33,14 @@ export function defaultProfile(username: string, displayName: string, avatar: st
     catchphrase: "",
     bio: "",
     specialties: [],
-    supportedTools: [],
-    skills: [],
-    experience: { work: [], education: [], awards: [] },
+    tools: [],
+    skillTags: [],
+    career: { work: [], education: [], awards: [] },
     portfolio: [],
     availability: "available",
     schedule: "",
-    sns: { github: githubUrl, twitter: "", other: "" },
+    sns: { github: githubUrl, twitter: "", website: "" },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
 }
-

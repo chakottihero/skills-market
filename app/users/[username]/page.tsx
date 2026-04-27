@@ -11,7 +11,7 @@ import type { Product, UserProfile, Availability } from "@/types";
 
 const AVAILABILITY_STYLE: Record<Availability, { label: string; cls: string }> = {
   available: { label: "対応可能", cls: "bg-emerald-100 text-emerald-700" },
-  depends:   { label: "内容による", cls: "bg-amber-100 text-amber-700" },
+  closed:    { label: "受付停止", cls: "bg-gray-100 text-gray-500" },
   busy:      { label: "多忙", cls: "bg-red-100 text-red-700" },
 };
 
@@ -113,8 +113,8 @@ export default function UserProfilePage() {
               </svg>
             </a>
           )}
-          {profile.sns.other && (
-            <a href={profile.sns.other} target="_blank" rel="noopener noreferrer"
+          {profile.sns.website && (
+            <a href={profile.sns.website} target="_blank" rel="noopener noreferrer"
               className="text-xs text-purple-600 hover:underline border border-purple-200 px-2 py-1 rounded-lg">
               Web
             </a>
@@ -136,17 +136,16 @@ export default function UserProfilePage() {
           )}
 
           {/* Work history */}
-          {profile.experience.work.length > 0 && (
+          {profile.career.work.length > 0 && (
             <div>
               <h2 className="text-lg font-bold text-gray-900 mb-3">{t.profile.work}</h2>
               <div className="space-y-4">
-                {profile.experience.work.map((w, i) => (
+                {profile.career.work.map((w, i) => (
                   <div key={i} className="flex gap-4">
                     <div className="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-purple-400" />
                     <div>
                       <div className="font-semibold text-gray-900">{w.role}</div>
                       <div className="text-sm text-gray-500">{w.company} · {w.period}</div>
-                      {w.description && <p className="text-sm text-gray-600 mt-1">{w.description}</p>}
                     </div>
                   </div>
                 ))}
@@ -155,16 +154,16 @@ export default function UserProfilePage() {
           )}
 
           {/* Education */}
-          {profile.experience.education.length > 0 && (
+          {profile.career.education.length > 0 && (
             <div>
               <h2 className="text-lg font-bold text-gray-900 mb-3">{t.profile.education}</h2>
               <div className="space-y-3">
-                {profile.experience.education.map((e, i) => (
+                {profile.career.education.map((e, i) => (
                   <div key={i} className="flex gap-4">
                     <div className="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-indigo-400" />
                     <div>
                       <div className="font-semibold text-gray-900">{e.school}</div>
-                      <div className="text-sm text-gray-500">{e.major} · {e.period}</div>
+                      <div className="text-sm text-gray-500">{e.detail} · {e.period}</div>
                     </div>
                   </div>
                 ))}
@@ -173,18 +172,17 @@ export default function UserProfilePage() {
           )}
 
           {/* Awards */}
-          {profile.experience.awards.length > 0 && (
+          {profile.career.awards.length > 0 && (
             <div>
               <h2 className="text-lg font-bold text-gray-900 mb-3">{t.profile.awards}</h2>
               <div className="space-y-3">
-                {profile.experience.awards.map((a, i) => (
+                {profile.career.awards.map((a, i) => (
                   <div key={i} className="flex gap-4">
                     <div className="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-amber-400" />
                     <div>
                       <div className="font-semibold text-gray-900">{a.title}
                         <span className="ml-2 text-xs text-gray-400 font-normal">{a.year}</span>
                       </div>
-                      {a.description && <p className="text-sm text-gray-600 mt-0.5">{a.description}</p>}
                     </div>
                   </div>
                 ))}
@@ -259,11 +257,11 @@ export default function UserProfilePage() {
           )}
 
           {/* Supported tools */}
-          {profile.supportedTools.length > 0 && (
+          {profile.tools.length > 0 && (
             <div className="bg-white border border-gray-200 rounded-xl p-4">
-              <div className="text-xs text-gray-400 mb-2">{t.profile.supportedTools}</div>
+              <div className="text-xs text-gray-400 mb-2">{t.profile.tools}</div>
               <div className="flex flex-wrap gap-1.5">
-                {profile.supportedTools.map((tool) => {
+                {profile.tools.map((tool) => {
                   const tc = toolColors[tool as keyof typeof toolColors] ?? toolColors.other;
                   return (
                     <span
@@ -280,11 +278,11 @@ export default function UserProfilePage() {
           )}
 
           {/* Skills / tags */}
-          {profile.skills.length > 0 && (
+          {profile.skillTags.length > 0 && (
             <div className="bg-white border border-gray-200 rounded-xl p-4">
-              <div className="text-xs text-gray-400 mb-2">{t.profile.skills}</div>
+              <div className="text-xs text-gray-400 mb-2">{t.profile.skillTags}</div>
               <div className="flex flex-wrap gap-1.5">
-                {profile.skills.map((s) => (
+                {profile.skillTags.map((s) => (
                   <span key={s} className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">
                     #{s}
                   </span>

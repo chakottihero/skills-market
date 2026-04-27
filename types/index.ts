@@ -1,9 +1,9 @@
 import type { ToolId } from "@/lib/tools";
 
 export type { ToolId };
-export type Tool = ToolId; // backward compat alias
+export type Tool = ToolId;
 export type Lang = "ja" | "en" | "zh";
-export type Availability = "available" | "depends" | "busy";
+export type Availability = "available" | "busy" | "closed";
 export type PriceType = "free" | "paid";
 
 export interface Author {
@@ -26,10 +26,10 @@ export interface Product {
   description_zh?: string;
   price: number;
   price_type: PriceType;
-  tool: Tool;                   // primary tool (for filter compat)
-  compatible_tools: string[];   // all compatible tools
-  category: string;             // category id e.g. "dev-tools"
-  subcategory?: string;         // subcategory id e.g. "code-review"
+  tool: Tool;
+  compatible_tools: string[];
+  category: string;
+  subcategory?: string;
   tags: string[];
   author: Author;
   content: string;
@@ -50,19 +50,17 @@ export interface WorkEntry {
   company: string;
   role: string;
   period: string;
-  description: string;
 }
 
 export interface EducationEntry {
   school: string;
-  major: string;
+  detail: string;
   period: string;
 }
 
 export interface AwardEntry {
   title: string;
-  year: number;
-  description: string;
+  year: string;
 }
 
 export interface PortfolioEntry {
@@ -75,24 +73,24 @@ export interface UserProfile {
   username: string;
   displayName: string;
   avatar: string;
-  coverImage: string;
+  coverImage?: string;
   catchphrase: string;
   bio: string;
   specialties: string[];
-  supportedTools: string[];
-  skills: string[];
-  experience: {
+  tools: string[];
+  skillTags: string[];
+  career: {
     work: WorkEntry[];
     education: EducationEntry[];
     awards: AwardEntry[];
   };
   portfolio: PortfolioEntry[];
   availability: Availability;
-  schedule: string;
+  schedule?: string;
   sns: {
-    github: string;
-    twitter: string;
-    other: string;
+    github?: string;
+    twitter?: string;
+    website?: string;
   };
   createdAt: string;
   updatedAt: string;
