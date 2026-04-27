@@ -159,6 +159,10 @@ const translations = {
     filter: {
       results: "{count}件の結果",
       activeFilters: "適用中のフィルター",
+      showMore: "もっと見る",
+      showLess: "閉じる",
+      allCategories: "全{count}カテゴリ",
+      allSubcategories: "すべてのサブカテゴリ",
     },
   },
   en: {
@@ -317,6 +321,10 @@ const translations = {
     filter: {
       results: "{count} results",
       activeFilters: "Active Filters",
+      showMore: "Show More",
+      showLess: "Show Less",
+      allCategories: "All {count} Categories",
+      allSubcategories: "All Subcategories",
     },
   },
   zh: {
@@ -475,6 +483,10 @@ const translations = {
     filter: {
       results: "{count} 个结果",
       activeFilters: "当前筛选",
+      showMore: "显示更多",
+      showLess: "收起",
+      allCategories: "全部{count}个分类",
+      allSubcategories: "所有子分类",
     },
   },
 } as const;
@@ -492,7 +504,7 @@ export type Translations = {
   availability: { available: string; depends: string; busy: string };
   publicProfile: { sellerSkills: string; noSkills: string; contact: string };
   stats: { skillsListed: string; sellers: string; totalPurchases: string; unit: { skills: string; people: string; purchases: string } };
-  filter: { results: string; activeFilters: string };
+  filter: { results: string; activeFilters: string; showMore: string; showLess: string; allCategories: string; allSubcategories: string };
 };
 
 export function getTranslations(locale: Locale): Translations {
