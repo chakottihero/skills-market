@@ -45,55 +45,60 @@ export default function ProductPage() {
       .catch(() => router.push("/skills"));
   }, [id, router]);
 
-  const handleDownload = async () => {
+  const handleCheckout = async () => {
     if (!session) { signIn("github"); return; }
+    if (!product) return;
+
+    const isFree = product.price_type === "free" || product.price === 0;
     setDownloading(true);
-    await fetch(`/api/download/${id}`, { method: "POST" });
-    setDownloading(false);
-    setDownloadDone(true);
+
+    const res = await fetch("/api/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ skillId: id, priceType: isFree ? "free" : "paid" }),
+    });
+    const data = await res.json() as { success?: boolean; free?: boolean; url?: string };
+
+    if (isFree && data.success) {
+      await fetch(`/api/download/${id}`, { method: "POST" });
+      setDownloading(false);
+      setDownloadDone(true);
+      setShowDownloadModal(true);
+    } else if (data.url) {
+      window.location.href = data.url;
+    } else {
+      setDownloading(false);
+    }
   };
 
   const renderActionBtn = (fullWidth = true) => {
     if (!product) return null;
     const w = fullWidth ? "w-full" : "";
-    if (product.price_type === "free" || product.price === 0) {
-      if (!session) {
-        return (
-          <button
-            onClick={() => signIn("github")}
-            className={`${w} mt-4 bg-purple-600 text-white font-semibold py-3 rounded-lg hover:bg-purple-700 transition-colors`}
-          >
-            {t.purchase.loginToDownload}
-          </button>
-        );
-      }
-      return (
-        <button
-          onClick={() => setShowDownloadModal(true)}
-          className={`${w} mt-4 bg-emerald-600 text-white font-semibold py-3 rounded-lg hover:bg-emerald-700 transition-colors`}
-        >
-          {t.purchase.free}
-        </button>
-      );
-    }
-    // paid
+    const isFree = product.price_type === "free" || product.price === 0;
+
     if (!session) {
       return (
         <button
           onClick={() => signIn("github")}
           className={`${w} mt-4 bg-purple-600 text-white font-semibold py-3 rounded-lg hover:bg-purple-700 transition-colors`}
         >
-          {t.purchase.loginToBuy}
+          {t.purchase.login}
         </button>
       );
     }
+
     return (
-      <Link
-        href={`/purchase/${id}`}
-        className={`${w} mt-4 block text-center bg-purple-600 text-white font-semibold py-3 rounded-lg hover:bg-purple-700 transition-colors`}
+      <button
+        onClick={handleCheckout}
+        disabled={downloading}
+        className={`${w} mt-4 ${isFree ? "bg-emerald-600 hover:bg-emerald-700" : "bg-purple-600 hover:bg-purple-700"} text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-60`}
       >
-        {t.purchase.buy.replace("{price}", product.price.toLocaleString())}
-      </Link>
+        {downloading
+          ? t.purchase.preparing
+          : isFree
+          ? t.purchase.free
+          : t.purchase.buy.replace("{price}", product.price.toLocaleString())}
+      </button>
     );
   };
 
@@ -214,49 +219,25 @@ export default function ProductPage() {
         <div className="flex-1">{renderActionBtn(true)}</div>
       </div>
 
-      {/* Download confirmation modal */}
+      {/* Download complete modal */}
       {showDownloadModal && (
         <div
           className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-          onClick={() => { if (!downloading) setShowDownloadModal(false); }}
+          onClick={() => { setShowDownloadModal(false); setDownloadDone(false); }}
         >
           <div
             className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            {downloadDone ? (
-              <>
-                <div className="text-4xl mb-3 text-center">✅</div>
-                <h3 className="text-lg font-bold text-gray-900 text-center mb-2">ダウンロード完了</h3>
-                <p className="text-sm text-gray-500 text-center mb-5">スキルを取得しました。</p>
-                <button
-                  onClick={() => { setShowDownloadModal(false); setDownloadDone(false); }}
-                  className="w-full bg-purple-600 text-white font-semibold py-2.5 rounded-lg hover:bg-purple-700 transition-colors"
-                >
-                  閉じる
-                </button>
-              </>
-            ) : (
-              <>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">{title}</h3>
-                <p className="text-sm text-gray-500 mb-5">無料でダウンロードします。よろしいですか？</p>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setShowDownloadModal(false)}
-                    className="flex-1 border border-gray-200 text-gray-600 font-medium py-2.5 rounded-lg hover:bg-gray-50 transition-colors text-sm"
-                  >
-                    キャンセル
-                  </button>
-                  <button
-                    onClick={handleDownload}
-                    disabled={downloading}
-                    className="flex-1 bg-emerald-600 text-white font-semibold py-2.5 rounded-lg hover:bg-emerald-700 transition-colors text-sm disabled:opacity-60"
-                  >
-                    {downloading ? t.purchase.preparing : t.purchase.free}
-                  </button>
-                </div>
-              </>
-            )}
+            <div className="text-4xl mb-3 text-center">✅</div>
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-2">ダウンロード完了</h3>
+            <p className="text-sm text-gray-500 text-center mb-5">スキルを取得しました。</p>
+            <button
+              onClick={() => { setShowDownloadModal(false); setDownloadDone(false); }}
+              className="w-full bg-purple-600 text-white font-semibold py-2.5 rounded-lg hover:bg-purple-700 transition-colors"
+            >
+              閉じる
+            </button>
           </div>
         </div>
       )}

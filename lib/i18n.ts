@@ -98,6 +98,7 @@ const translations = {
     purchase: {
       free: "無料でダウンロード",
       buy: "¥{price}で購入する",
+      login: "ログインして購入",
       loginToDownload: "ダウンロードするにはログインが必要です",
       loginToBuy: "購入するにはログインが必要です",
       confirm: "購入を確定する",
@@ -107,6 +108,10 @@ const translations = {
       summary: "注文内容",
       total: "合計",
       taxIncluded: "税込",
+      success: "購入完了！",
+      download: "ダウンロードする",
+      failed: "決済の確認に失敗しました",
+      backToSkills: "スキル一覧に戻る",
     },
     categories: {
       title: "カテゴリ一覧",
@@ -289,8 +294,9 @@ const translations = {
       noDownloads: "No downloaded skills yet",
     },
     purchase: {
-      free: "Download Free",
+      free: "Free Download",
       buy: "Buy for ¥{price}",
+      login: "Login to Purchase",
       loginToDownload: "Login required to download",
       loginToBuy: "Login required to purchase",
       confirm: "Confirm Purchase",
@@ -300,6 +306,10 @@ const translations = {
       summary: "Order Summary",
       total: "Total",
       taxIncluded: "Tax included",
+      success: "Purchase Complete!",
+      download: "Download",
+      failed: "Payment verification failed",
+      backToSkills: "Back to Skills",
     },
     categories: {
       title: "Categories",
@@ -484,6 +494,7 @@ const translations = {
     purchase: {
       free: "免费下载",
       buy: "¥{price}购买",
+      login: "登录后购买",
       loginToDownload: "需要登录才能下载",
       loginToBuy: "需要登录才能购买",
       confirm: "确认购买",
@@ -493,6 +504,10 @@ const translations = {
       summary: "订单摘要",
       total: "合计",
       taxIncluded: "含税",
+      success: "购买完成！",
+      download: "下载",
+      failed: "支付验证失败",
+      backToSkills: "返回技能列表",
     },
     categories: {
       title: "分类列表",
@@ -591,7 +606,7 @@ export type Translations = {
   product: { buy: string; free: string; stars: string; purchases: string; author: string; category: string; tags: string; preview: string; repoLink: string; tool: string; compatibleTools: string };
   sell: { title: string; subtitle: string; formTitle: string; formDesc: string; formPrice: string; formPriceType: string; priceFree: string; pricePaid: string; formTool: string; formTools: string; formCategory: string; formSubcategory: string; formTags: string; formContent: string; formRepoUrl: string; formLang: string; submit: string; loginRequired: string; success: string };
   mypage: { title: string; listings: string; purchases: string; noListings: string; noPurchases: string; loginRequired: string; edit: string; delete: string; profileLink: string; completion: string; downloads: string; noDownloads: string };
-  purchase: { free: string; buy: string; loginToDownload: string; loginToBuy: string; confirm: string; preparing: string; notifyMe: string; emailPlaceholder: string; summary: string; total: string; taxIncluded: string };
+  purchase: { free: string; buy: string; login: string; loginToDownload: string; loginToBuy: string; confirm: string; preparing: string; notifyMe: string; emailPlaceholder: string; summary: string; total: string; taxIncluded: string; success: string; download: string; failed: string; backToSkills: string };
   categories: { title: string; skillCount: string };
   common: { loading: string; error: string; back: string; free: string; yen: string };
   profile: { title: string; edit: string; save: string; saved: string; avatar: string; coverImage: string; displayName: string; catchphrase: string; bio: string; specialties: string; supportedTools: string; tools: string; skills: string; skillTags: string; experience: string; career: string; work: string; education: string; awards: string; portfolio: string; availability: string; available: string; busy: string; closed: string; schedule: string; sns: string; viewPublic: string; addWork: string; addEducation: string; addAward: string; addPortfolio: string; company: string; role: string; period: string; description: string; school: string; major: string; detail: string; awardTitle: string; year: string; url: string; delete: string; completion: string; noSkills: string };
