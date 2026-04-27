@@ -34,8 +34,8 @@ export interface Product {
   author: Author;
   content: string;
   repoUrl: string;
-  stars: number;
-  purchases: number;
+  stars?: number;
+  purchases?: number;
   createdAt: string;
   lang: Lang;
 }

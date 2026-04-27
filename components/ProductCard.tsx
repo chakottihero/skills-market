@@ -5,6 +5,7 @@ import type { Product } from "@/types";
 import { useLanguage } from "./LanguageContext";
 import { localTitle, localShortDescription } from "@/lib/localizeProduct";
 import { TOOL_MAP } from "@/lib/tools";
+import { CATEGORY_MAP, getCategoryName } from "@/lib/categories";
 
 export default function ProductCard({ product }: { product: Product }) {
   const { t, locale } = useLanguage();
@@ -46,9 +47,12 @@ export default function ProductCard({ product }: { product: Product }) {
           </span>
         </div>
 
-        <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-purple-600 transition-colors">
+        <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2 group-hover:text-purple-600 transition-colors">
           {title}
         </h3>
+        <p className="text-xs text-gray-400 mb-2">
+          {CATEGORY_MAP[product.category]?.icon} {getCategoryName(product.category, locale)}
+        </p>
         <p className="text-sm text-gray-500 line-clamp-2 flex-1 mb-4">
           {desc}
         </p>
@@ -69,10 +73,7 @@ export default function ProductCard({ product }: { product: Product }) {
             />
             <span className="text-xs text-gray-500">{product.author.name}</span>
           </Link>
-          <div className="flex items-center gap-3 text-xs text-gray-400">
-            <span>⭐ {product.stars}</span>
-            <span>🛒 {product.purchases}</span>
-          </div>
+          <span className="text-xs text-gray-400">{product.createdAt.slice(0, 10)}</span>
         </div>
       </div>
     </Link>

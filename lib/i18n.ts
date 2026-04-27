@@ -92,6 +92,21 @@ const translations = {
       delete: "削除",
       profileLink: "プロフィール編集",
       completion: "プロフィール完成度",
+      downloads: "ダウンロード済みスキル",
+      noDownloads: "ダウンロード済みスキルはありません",
+    },
+    purchase: {
+      free: "無料でダウンロード",
+      buy: "¥{price}で購入する",
+      loginToDownload: "ダウンロードするにはログインが必要です",
+      loginToBuy: "購入するにはログインが必要です",
+      confirm: "購入を確定する",
+      preparing: "準備中です...",
+      notifyMe: "リリース通知を受け取る",
+      emailPlaceholder: "メールアドレスを入力",
+      summary: "注文内容",
+      total: "合計",
+      taxIncluded: "税込",
     },
     categories: {
       title: "カテゴリ一覧",
@@ -154,6 +169,7 @@ const translations = {
       skillsListed: "登録スキル数",
       sellers: "出品者数",
       totalPurchases: "累計購入数",
+      categories: "カテゴリ",
       unit: { skills: "件", people: "人", purchases: "件" },
     },
     filter: {
@@ -254,6 +270,21 @@ const translations = {
       delete: "Delete",
       profileLink: "Edit Profile",
       completion: "Profile Completion",
+      downloads: "Downloaded Skills",
+      noDownloads: "No downloaded skills yet",
+    },
+    purchase: {
+      free: "Download Free",
+      buy: "Buy for ¥{price}",
+      loginToDownload: "Login required to download",
+      loginToBuy: "Login required to purchase",
+      confirm: "Confirm Purchase",
+      preparing: "Preparing...",
+      notifyMe: "Notify me when available",
+      emailPlaceholder: "Enter your email",
+      summary: "Order Summary",
+      total: "Total",
+      taxIncluded: "Tax included",
     },
     categories: {
       title: "Categories",
@@ -316,6 +347,7 @@ const translations = {
       skillsListed: "Skills Listed",
       sellers: "Sellers",
       totalPurchases: "Total Purchases",
+      categories: "Categories",
       unit: { skills: "", people: "", purchases: "" },
     },
     filter: {
@@ -416,6 +448,21 @@ const translations = {
       delete: "删除",
       profileLink: "编辑资料",
       completion: "资料完成度",
+      downloads: "已下载技能",
+      noDownloads: "暂无已下载技能",
+    },
+    purchase: {
+      free: "免费下载",
+      buy: "¥{price}购买",
+      loginToDownload: "需要登录才能下载",
+      loginToBuy: "需要登录才能购买",
+      confirm: "确认购买",
+      preparing: "准备中...",
+      notifyMe: "上线时通知我",
+      emailPlaceholder: "输入您的邮箱",
+      summary: "订单摘要",
+      total: "合计",
+      taxIncluded: "含税",
     },
     categories: {
       title: "分类列表",
@@ -478,6 +525,7 @@ const translations = {
       skillsListed: "已注册技能",
       sellers: "卖家数",
       totalPurchases: "累计购买",
+      categories: "分类",
       unit: { skills: "个", people: "人", purchases: "次" },
     },
     filter: {
@@ -497,13 +545,14 @@ export type Translations = {
   skills: { title: string; searchPlaceholder: string; filterTool: string; filterCategory: string; sortBy: string; sortNewest: string; sortPopular: string; sortPrice: string; allTools: string; allCategories: string; free: string; noResults: string; priceAll: string; priceFree: string; pricePaid: string };
   product: { buy: string; free: string; stars: string; purchases: string; author: string; category: string; tags: string; preview: string; repoLink: string; tool: string; compatibleTools: string };
   sell: { title: string; subtitle: string; formTitle: string; formDesc: string; formPrice: string; formPriceType: string; priceFree: string; pricePaid: string; formTool: string; formTools: string; formCategory: string; formSubcategory: string; formTags: string; formContent: string; formRepoUrl: string; formLang: string; submit: string; loginRequired: string; success: string };
-  mypage: { title: string; listings: string; purchases: string; noListings: string; noPurchases: string; loginRequired: string; edit: string; delete: string; profileLink: string; completion: string };
+  mypage: { title: string; listings: string; purchases: string; noListings: string; noPurchases: string; loginRequired: string; edit: string; delete: string; profileLink: string; completion: string; downloads: string; noDownloads: string };
+  purchase: { free: string; buy: string; loginToDownload: string; loginToBuy: string; confirm: string; preparing: string; notifyMe: string; emailPlaceholder: string; summary: string; total: string; taxIncluded: string };
   categories: { title: string; skillCount: string };
   common: { loading: string; error: string; back: string; free: string; yen: string };
   profile: { title: string; save: string; saved: string; avatar: string; coverImage: string; displayName: string; catchphrase: string; bio: string; specialties: string; supportedTools: string; skills: string; experience: string; work: string; education: string; awards: string; portfolio: string; availability: string; schedule: string; sns: string; viewPublic: string; addWork: string; addEducation: string; addAward: string; addPortfolio: string; company: string; role: string; period: string; description: string; school: string; major: string; awardTitle: string; year: string; url: string; delete: string };
   availability: { available: string; depends: string; busy: string };
   publicProfile: { sellerSkills: string; noSkills: string; contact: string };
-  stats: { skillsListed: string; sellers: string; totalPurchases: string; unit: { skills: string; people: string; purchases: string } };
+  stats: { skillsListed: string; sellers: string; totalPurchases: string; categories: string; unit: { skills: string; people: string; purchases: string } };
   filter: { results: string; activeFilters: string; showMore: string; showLess: string; allCategories: string; allSubcategories: string };
 };
 

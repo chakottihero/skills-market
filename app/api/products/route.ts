@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  if (sort === "popular") filtered.sort((a, b) => b.purchases - a.purchases);
+  if (sort === "popular") filtered.sort((a, b) => (b.purchases ?? 0) - (a.purchases ?? 0));
   else if (sort === "price") filtered.sort((a, b) => a.price - b.price);
   else filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 

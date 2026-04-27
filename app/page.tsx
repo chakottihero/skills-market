@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import ProductCard from "@/components/ProductCard";
 import { useLanguage } from "@/components/LanguageContext";
 import { TOOLS } from "@/lib/tools";
+import { CATEGORIES } from "@/lib/categories";
 import type { Product } from "@/types";
 
 export default function HomePage() {
   const { t } = useLanguage();
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [priceTab, setPriceTab] = useState<"" | "free" | "paid">("");
-  const [stats, setStats] = useState({ skills: 0, sellers: 0, purchases: 0 });
+  const [stats, setStats] = useState({ skills: 0, sellers: 0 });
 
   useEffect(() => {
     fetch("/api/products?sort=popular")
@@ -18,9 +19,8 @@ export default function HomePage() {
       .then((d) => {
         const products = d.products as Product[];
         setAllProducts(products);
-        const uniqueSellers = new Set(products.map((p) => p.author.name)).size;
-        const totalPurchases = products.reduce((sum, p) => sum + p.purchases, 0);
-        setStats({ skills: products.length, sellers: uniqueSellers, purchases: totalPurchases });
+        const uniqueSellers = new Set(products.map((p) => p.author.login)).size;
+        setStats({ skills: products.length, sellers: uniqueSellers });
       });
   }, []);
 
@@ -68,8 +68,8 @@ export default function HomePage() {
               label: t.stats.sellers,
             },
             {
-              value: `${stats.purchases.toLocaleString()}${t.stats.unit.purchases}`,
-              label: t.stats.totalPurchases,
+              value: String(CATEGORIES.length),
+              label: t.stats.categories,
             },
           ].map(({ value, label }) => (
             <div key={label}>

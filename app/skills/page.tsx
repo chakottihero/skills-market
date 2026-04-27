@@ -7,10 +7,6 @@ import { CATEGORIES, CATEGORY_MAP, getCategoryName, getSubcategoryName } from "@
 import { TOOLS, TOOL_MAP } from "@/lib/tools";
 import type { Product } from "@/types";
 
-const TOP_CATEGORY_IDS = ["dev-tools", "web-dev", "ai-ml", "data-analytics", "utility", "docs"];
-const TOP_CATEGORIES = TOP_CATEGORY_IDS
-  .map((id) => CATEGORIES.find((c) => c.id === id))
-  .filter((c): c is NonNullable<typeof c> => Boolean(c));
 
 export default function SkillsPage() {
   return (
@@ -204,17 +200,12 @@ function SkillsPageInner() {
             ))}
           </div>
 
-          {/* Category: top 6 + expand button */}
+          {/* Category: All + expand button only */}
           <div className="space-y-2">
-            <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+            <div className="flex gap-2 pb-1">
               <button onClick={() => handleSetCategory("")} className={chipCls("", category)}>
                 {t.skills.allCategories}
               </button>
-              {TOP_CATEGORIES.map((cat) => (
-                <button key={cat.id} onClick={() => handleSetCategory(cat.id)} className={chipCls(cat.id, category)}>
-                  {cat.icon} {getCategoryName(cat.id, locale)}
-                </button>
-              ))}
               <button
                 onClick={() => setShowAllCats(!showAllCats)}
                 className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border border-dashed border-purple-300 text-purple-600 whitespace-nowrap hover:bg-purple-50 transition-colors"

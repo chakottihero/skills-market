@@ -26,8 +26,6 @@
       },
       "content": "# Python Code Review Skill\n\n## Overview\nAutomatically review Python code for quality, security, and style issues.\n\n## Features\n- PEP8 compliance check\n- Type annotation validation (mypy)\n- Security risk detection (bandit)\n- Complexity analysis\n- Refactoring suggestions\n\n## Usage\nPoint at any Python file or module and run the review.",
       "repoUrl": "https://github.com/chakottihero/skills-market",
-      "stars": 42,
-      "purchases": 128,
       "createdAt": "2026-04-01T09:00:00Z",
       "lang": "ja"
     },
@@ -57,8 +55,6 @@
       },
       "content": "# React Component Generator\n\n## Overview\nGenerate production-ready React components instantly.\n\n## Features\n- TypeScript props with full type safety\n- Tailwind CSS styling\n- Storybook stories\n- Vitest unit tests\n- Accessibility (ARIA) support\n\n## Usage\nDescribe the component or paste a Figma URL.",
       "repoUrl": "https://github.com/chakottihero/skills-market",
-      "stars": 87,
-      "purchases": 234,
       "createdAt": "2026-04-03T10:00:00Z",
       "lang": "ja"
     },
@@ -88,8 +84,6 @@
       },
       "content": "# Git Operations Automation\n\n## Features\n- Conventional Commits message generator\n- PR description auto-fill\n- Merge conflict resolver\n- CHANGELOG generator\n- Branch naming enforcer\n\n## Setup\nAdd to your CLAUDE.md or .cursorrules file.",
       "repoUrl": "https://github.com/chakottihero/skills-market",
-      "stars": 63,
-      "purchases": 192,
       "createdAt": "2026-04-05T11:00:00Z",
       "lang": "ja"
     },
@@ -119,8 +113,6 @@
       },
       "content": "# README Auto-Generator\n\n## Features\n- Shields.io badge generation\n- Auto-detect tech stack\n- Installation steps from package.json\n- API endpoint extraction\n- Multi-language output (ja/en/zh)\n\n## Usage\nRun on any project root directory.",
       "repoUrl": "https://github.com/chakottihero/skills-market",
-      "stars": 55,
-      "purchases": 176,
       "createdAt": "2026-04-07T09:00:00Z",
       "lang": "ja"
     },
@@ -150,8 +142,6 @@
       },
       "content": "# Data Visualization Skill\n\n## Supported Libraries\n- Chart.js / Recharts (React)\n- Plotly (Python/JS)\n- matplotlib / seaborn (Python)\n- D3.js\n\n## Features\n- Auto-detect best chart type\n- Color palette recommendation\n- Responsive design code\n- Export to PNG/SVG",
       "repoUrl": "https://github.com/chakottihero/skills-market",
-      "stars": 38,
-      "purchases": 145,
       "createdAt": "2026-04-09T14:00:00Z",
       "lang": "ja"
     },
@@ -181,8 +171,6 @@
       },
       "content": "# AI Agent Building Kit\n\n## What's Included\n- Agent architecture templates (ReAct, Plan-and-Execute, Multi-agent)\n- Tool integration guide (web search, code execution, file I/O)\n- Memory system setup (short-term, long-term, episodic)\n- MCP server connection examples\n- Production deployment checklist\n\n## Supported Frameworks\nLangChain, LangGraph, CrewAI, AutoGen, Claude SDK",
       "repoUrl": "https://github.com/chakottihero/skills-market",
-      "stars": 124,
-      "purchases": 87,
       "createdAt": "2026-04-10T10:00:00Z",
       "lang": "ja"
     },
@@ -212,8 +200,6 @@
       },
       "content": "# Full-Stack Web Development Skill\n\n## Stack\n- Next.js 16 (App Router)\n- TypeScript strict mode\n- Prisma + PostgreSQL\n- tRPC / Server Actions\n- NextAuth.js v5\n- Stripe payment integration\n- Vercel / Railway deployment\n\n## Included Templates\n- SaaS starter\n- E-commerce template\n- Dashboard template",
       "repoUrl": "https://github.com/chakottihero/skills-market",
-      "stars": 198,
-      "purchases": 143,
       "createdAt": "2026-04-12T09:00:00Z",
       "lang": "ja"
     },
@@ -238,13 +224,11 @@
       "author": {
         "name": "Skills Market 公式",
         "login": "skills-market",
-        "githubUrl": "https://github.com/chakottihero",
+        "githubUrl": "https://github.com/chakottihero/skills-market",
         "avatar": "https://avatars.githubusercontent.com/u/197975374?v=4"
       },
       "content": "# Security Audit Skill\n\n## Detection Coverage\n- Injection (SQLi, NoSQLi, Command)\n- XSS (Reflected/Stored/DOM)\n- CSRF & SSRF\n- Broken Authentication\n- Sensitive Data Exposure\n- Security Misconfiguration\n- Vulnerable Dependencies\n\n## Output Format\n- Severity-ranked report\n- Fix code snippets\n- Test cases for each vulnerability",
       "repoUrl": "https://github.com/chakottihero/skills-market",
-      "stars": 89,
-      "purchases": 56,
       "createdAt": "2026-04-14T11:00:00Z",
       "lang": "ja"
     },
@@ -274,8 +258,6 @@
       },
       "content": "# Marketing Automation Skill\n\n## Channels Supported\n- Twitter/X (threads & single tweets)\n- Instagram (captions & hashtags)\n- LinkedIn (articles & posts)\n- Email newsletters\n- Landing page copy\n\n## Features\n- Persona-based tone adjustment\n- A/B variant generation\n- Multilingual output (ja/en/zh)\n- Engagement score estimation",
       "repoUrl": "https://github.com/chakottihero/skills-market",
-      "stars": 71,
-      "purchases": 98,
       "createdAt": "2026-04-16T13:00:00Z",
       "lang": "ja"
     },
@@ -305,8 +287,6 @@
       },
       "content": "# Game Development Template Skill\n\n## Unity Templates\n- Character Controller (2D/3D)\n- NavMesh AI agent\n- Inventory & Equipment system\n- Save/Load system\n- UI Manager pattern\n\n## Unreal Engine Templates\n- Blueprint Character\n- AI Behavior Tree\n- Game Instance (persistent state)\n- Widget UI system",
       "repoUrl": "https://github.com/chakottihero/skills-market",
-      "stars": 156,
-      "purchases": 112,
       "createdAt": "2026-04-18T10:00:00Z",
       "lang": "ja"
     }

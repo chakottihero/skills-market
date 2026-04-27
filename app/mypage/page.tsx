@@ -147,6 +147,14 @@ export default function MyPage() {
         )}
       </div>
 
+      {/* Downloads placeholder */}
+      <div className="mb-12">
+        <h2 className="text-xl font-bold text-gray-900 mb-5">{t.mypage.downloads}</h2>
+        <div className="text-center text-gray-400 py-10 border border-dashed border-gray-200 rounded-xl">
+          {t.mypage.noDownloads}
+        </div>
+      </div>
+
       {/* Purchases placeholder */}
       <div>
         <h2 className="text-xl font-bold text-gray-900 mb-5">{t.mypage.purchases}</h2>

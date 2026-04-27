@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import { useLanguage } from "@/components/LanguageContext";
-import { toolColors } from "@/lib/toolColors";
 import { localTitle, localDescription } from "@/lib/localizeProduct";
 import { TOOL_MAP } from "@/lib/tools";
 import { getCategoryName } from "@/lib/categories";
@@ -19,10 +19,16 @@ const AVAILABILITY_STYLE: Record<Availability, { label: string; cls: string }> =
 export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const { data: session } = useSession();
   const { t, locale } = useLanguage();
   const [product, setProduct] = useState<Product | null>(null);
   const [seller, setSeller] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Download modal state
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [downloadDone, setDownloadDone] = useState(false);
 
   useEffect(() => {
     fetch(`/api/products/${id}`)
@@ -31,7 +37,6 @@ export default function ProductPage() {
         const p = d.product as Product;
         setProduct(p);
         setLoading(false);
-        // 出品者プロフィールを非同期で取得
         try {
           const pr = await fetch(`/api/users/${p.author.login}`);
           if (pr.ok) setSeller((await pr.json()).profile as UserProfile);
@@ -40,16 +45,67 @@ export default function ProductPage() {
       .catch(() => router.push("/skills"));
   }, [id, router]);
 
+  const handleDownload = async () => {
+    if (!session) { signIn("github"); return; }
+    setDownloading(true);
+    await fetch(`/api/download/${id}`, { method: "POST" });
+    setDownloading(false);
+    setDownloadDone(true);
+  };
+
+  const renderActionBtn = (fullWidth = true) => {
+    if (!product) return null;
+    const w = fullWidth ? "w-full" : "";
+    if (product.price_type === "free" || product.price === 0) {
+      if (!session) {
+        return (
+          <button
+            onClick={() => signIn("github")}
+            className={`${w} mt-4 bg-purple-600 text-white font-semibold py-3 rounded-lg hover:bg-purple-700 transition-colors`}
+          >
+            {t.purchase.loginToDownload}
+          </button>
+        );
+      }
+      return (
+        <button
+          onClick={() => setShowDownloadModal(true)}
+          className={`${w} mt-4 bg-emerald-600 text-white font-semibold py-3 rounded-lg hover:bg-emerald-700 transition-colors`}
+        >
+          {t.purchase.free}
+        </button>
+      );
+    }
+    // paid
+    if (!session) {
+      return (
+        <button
+          onClick={() => signIn("github")}
+          className={`${w} mt-4 bg-purple-600 text-white font-semibold py-3 rounded-lg hover:bg-purple-700 transition-colors`}
+        >
+          {t.purchase.loginToBuy}
+        </button>
+      );
+    }
+    return (
+      <Link
+        href={`/purchase/${id}`}
+        className={`${w} mt-4 block text-center bg-purple-600 text-white font-semibold py-3 rounded-lg hover:bg-purple-700 transition-colors`}
+      >
+        {t.purchase.buy.replace("{price}", product.price.toLocaleString())}
+      </Link>
+    );
+  };
+
   if (loading) return <div className="text-center py-20 text-gray-400">{t.common.loading}</div>;
   if (!product) return null;
 
-  const tool = toolColors[product.tool] ?? toolColors.other;
   const title = localTitle(product, locale);
   const desc = localDescription(product, locale);
   const avail = seller ? AVAILABILITY_STYLE[seller.availability] : null;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-10">
+    <div className="max-w-4xl mx-auto px-4 py-10 pb-28 sm:pb-10">
       <Link href="/skills" className="text-sm text-gray-500 hover:text-gray-700 mb-6 inline-block">
         ← {t.common.back}
       </Link>
@@ -94,7 +150,6 @@ export default function ProductPage() {
 
         {/* Sidebar */}
         <div className="space-y-4">
-          {/* Purchase card */}
           <div className="bg-white rounded-xl border border-gray-200 p-6 sticky top-24">
             <div className="text-3xl font-bold text-gray-900 mb-1">
               {product.price === 0 ? (
@@ -103,9 +158,7 @@ export default function ProductPage() {
                 `¥${product.price.toLocaleString()}`
               )}
             </div>
-            <button className="w-full mt-4 bg-purple-600 text-white font-semibold py-3 rounded-lg hover:bg-purple-700 transition-colors">
-              {product.price === 0 ? t.product.free : t.product.buy}
-            </button>
+            {renderActionBtn()}
             {product.repoUrl && (
               <a
                 href={product.repoUrl}
@@ -144,21 +197,69 @@ export default function ProductPage() {
                   )}
                 </div>
               </Link>
-
-              <div className="grid grid-cols-2 gap-3 text-center mt-4">
-                <div className="bg-gray-50 rounded-lg p-2">
-                  <div className="text-lg font-bold text-gray-900">⭐ {product.stars}</div>
-                  <div className="text-xs text-gray-400">{t.product.stars}</div>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-2">
-                  <div className="text-lg font-bold text-gray-900">🛒 {product.purchases}</div>
-                  <div className="text-xs text-gray-400">{t.product.purchases}</div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Mobile sticky bottom bar */}
+      <div className="fixed bottom-0 left-0 right-0 sm:hidden z-40 bg-white border-t border-gray-200 px-4 py-3 flex items-center gap-3">
+        <div className="font-bold text-gray-900">
+          {product.price === 0 ? (
+            <span className="text-emerald-600">{t.common.free}</span>
+          ) : (
+            `¥${product.price.toLocaleString()}`
+          )}
+        </div>
+        <div className="flex-1">{renderActionBtn(true)}</div>
+      </div>
+
+      {/* Download confirmation modal */}
+      {showDownloadModal && (
+        <div
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          onClick={() => { if (!downloading) setShowDownloadModal(false); }}
+        >
+          <div
+            className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {downloadDone ? (
+              <>
+                <div className="text-4xl mb-3 text-center">✅</div>
+                <h3 className="text-lg font-bold text-gray-900 text-center mb-2">ダウンロード完了</h3>
+                <p className="text-sm text-gray-500 text-center mb-5">スキルを取得しました。</p>
+                <button
+                  onClick={() => { setShowDownloadModal(false); setDownloadDone(false); }}
+                  className="w-full bg-purple-600 text-white font-semibold py-2.5 rounded-lg hover:bg-purple-700 transition-colors"
+                >
+                  閉じる
+                </button>
+              </>
+            ) : (
+              <>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">{title}</h3>
+                <p className="text-sm text-gray-500 mb-5">無料でダウンロードします。よろしいですか？</p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowDownloadModal(false)}
+                    className="flex-1 border border-gray-200 text-gray-600 font-medium py-2.5 rounded-lg hover:bg-gray-50 transition-colors text-sm"
+                  >
+                    キャンセル
+                  </button>
+                  <button
+                    onClick={handleDownload}
+                    disabled={downloading}
+                    className="flex-1 bg-emerald-600 text-white font-semibold py-2.5 rounded-lg hover:bg-emerald-700 transition-colors text-sm disabled:opacity-60"
+                  >
+                    {downloading ? t.purchase.preparing : t.purchase.free}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
