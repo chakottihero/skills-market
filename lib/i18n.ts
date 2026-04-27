@@ -180,6 +180,11 @@ const translations = {
       allCategories: "全{count}カテゴリ",
       allSubcategories: "すべてのサブカテゴリ",
     },
+    empty: {
+      noSkills: "まだスキルが出品されていません",
+      beFirst: "最初の出品者になりましょう！",
+      listSkill: "スキルを出品する",
+    },
   },
   en: {
     nav: {
@@ -357,6 +362,11 @@ const translations = {
       showLess: "Show Less",
       allCategories: "All {count} Categories",
       allSubcategories: "All Subcategories",
+    },
+    empty: {
+      noSkills: "No skills listed yet",
+      beFirst: "Be the first to list a skill!",
+      listSkill: "List a Skill",
     },
   },
   zh: {
@@ -536,6 +546,11 @@ const translations = {
       allCategories: "全部{count}个分类",
       allSubcategories: "所有子分类",
     },
+    empty: {
+      noSkills: "暂无技能",
+      beFirst: "成为第一个发布者！",
+      listSkill: "发布技能",
+    },
   },
 } as const;
 
@@ -554,6 +569,7 @@ export type Translations = {
   publicProfile: { sellerSkills: string; noSkills: string; contact: string };
   stats: { skillsListed: string; sellers: string; totalPurchases: string; categories: string; unit: { skills: string; people: string; purchases: string } };
   filter: { results: string; activeFilters: string; showMore: string; showLess: string; allCategories: string; allSubcategories: string };
+  empty: { noSkills: string; beFirst: string; listSkill: string };
 };
 
 export function getTranslations(locale: Locale): Translations {

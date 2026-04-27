@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useCallback, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 import { useLanguage } from "@/components/LanguageContext";
 import { CATEGORIES, CATEGORY_MAP, getCategoryName, getSubcategoryName } from "@/lib/categories";
@@ -306,7 +307,19 @@ function SkillsPageInner() {
       {loading ? (
         <div className="text-center text-gray-400 py-20">{t.common.loading}</div>
       ) : products.length === 0 ? (
-        <div className="text-center text-gray-400 py-20">{t.skills.noResults}</div>
+        <div className="text-center py-20">
+          <p className="text-gray-500 font-medium mb-1">
+            {hasActiveFilters ? t.skills.noResults : t.empty.noSkills}
+          </p>
+          {!hasActiveFilters && (
+            <>
+              <p className="text-gray-400 text-sm mb-6">{t.empty.beFirst}</p>
+              <Link href="/sell" className="inline-block bg-purple-600 text-white font-semibold px-6 py-2.5 rounded-full hover:bg-purple-700 transition-colors text-sm">
+                {t.empty.listSkill} →
+              </Link>
+            </>
+          )}
+        </div>
       ) : (
         <>
           <p className="text-sm text-gray-500 mb-4">

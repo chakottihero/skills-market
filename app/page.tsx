@@ -122,8 +122,20 @@ export default function HomePage() {
             </Link>
           </div>
         </div>
-        {featured.length === 0 ? (
-          <div className="text-center text-gray-400 py-16">{t.common.loading}</div>
+        {allProducts.length === 0 ? (
+          <div className="text-center py-16 border border-dashed border-gray-200 rounded-2xl">
+            <div className="text-4xl mb-4">📭</div>
+            <p className="text-gray-500 font-medium mb-1">{t.empty.noSkills}</p>
+            <p className="text-gray-400 text-sm mb-6">{t.empty.beFirst}</p>
+            <Link
+              href="/sell"
+              className="inline-block bg-purple-600 text-white font-semibold px-6 py-2.5 rounded-full hover:bg-purple-700 transition-colors"
+            >
+              {t.empty.listSkill} →
+            </Link>
+          </div>
+        ) : featured.length === 0 ? (
+          <div className="text-center text-gray-400 py-16">{t.skills.noResults}</div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {featured.map((p) => (
