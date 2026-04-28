@@ -24,14 +24,15 @@ export default function ProductPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [seller, setSeller] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-
-  // Download modal state
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [downloadDone, setDownloadDone] = useState(false);
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
+
+  const login = (session?.user as { login?: string })?.login ?? session?.user?.name ?? "";
 
   useEffect(() => {
-    fetch(`/api/products/${id}`)
+    fetch(`/api/skills/${id}`)
       .then((r) => { if (!r.ok) throw new Error("not found"); return r.json(); })
       .then(async (d) => {
         const p = d.product as Product;
@@ -60,7 +61,9 @@ export default function ProductPage() {
     const data = await res.json() as { success?: boolean; free?: boolean; url?: string };
 
     if (isFree && data.success) {
-      await fetch(`/api/download/${id}`, { method: "POST" });
+      const dlRes = await fetch(`/api/download/${id}`, { method: "POST" });
+      const dlData = await dlRes.json() as { fileUrl?: string };
+      if (dlData.fileUrl) setFileUrl(dlData.fileUrl);
       setDownloading(false);
       setDownloadDone(true);
       setShowDownloadModal(true);
@@ -71,10 +74,19 @@ export default function ProductPage() {
     }
   };
 
+  const handleDelete = async () => {
+    if (!confirm("このスキルを削除しますか？")) return;
+    const res = await fetch(`/api/skills/${id}`, { method: "DELETE" });
+    if (res.ok) router.push("/skills");
+  };
+
   const renderActionBtn = (fullWidth = true) => {
     if (!product) return null;
     const w = fullWidth ? "w-full" : "";
     const isFree = product.price_type === "free" || product.price === 0;
+    const isOwner = !!login && login === product.author.login;
+
+    if (isOwner) return null;
 
     if (!session) {
       return (
@@ -108,12 +120,25 @@ export default function ProductPage() {
   const title = localTitle(product, locale);
   const desc = localDescription(product, locale);
   const avail = seller ? AVAILABILITY_STYLE[seller.availability] : null;
+  const isOwner = !!login && login === product.author.login;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10 pb-28 sm:pb-10">
-      <Link href="/skills" className="text-sm text-gray-500 hover:text-gray-700 mb-6 inline-block">
-        ← {t.common.back}
-      </Link>
+      <div className="flex items-center justify-between mb-6">
+        <Link href="/skills" className="text-sm text-gray-500 hover:text-gray-700">
+          ← {t.common.back}
+        </Link>
+        {isOwner && (
+          <div className="flex gap-2">
+            <button
+              onClick={handleDelete}
+              className="text-xs bg-red-100 text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-200 transition-colors"
+            >
+              {t.mypage.delete}
+            </button>
+          </div>
+        )}
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main */}
@@ -136,21 +161,25 @@ export default function ProductPage() {
           </div>
 
           {/* Tags */}
-          <div className="flex flex-wrap gap-2">
-            {product.tags.map((tag) => (
-              <span key={tag} className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">
-                #{tag}
-              </span>
-            ))}
-          </div>
-
-          {/* Content Preview */}
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-3">{t.product.preview}</h2>
-            <div className="bg-gray-900 text-gray-100 rounded-xl p-5 text-sm font-mono whitespace-pre-wrap max-h-80 overflow-y-auto">
-              {product.content}
+          {product.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {product.tags.map((tag) => (
+                <span key={tag} className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">
+                  #{tag}
+                </span>
+              ))}
             </div>
-          </div>
+          )}
+
+          {/* Content Preview (shown only if content exists) */}
+          {product.content && (
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900 mb-3">{t.product.preview}</h2>
+              <div className="bg-gray-900 text-gray-100 rounded-xl p-5 text-sm font-mono whitespace-pre-wrap max-h-80 overflow-y-auto">
+                {product.content}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Sidebar */}
@@ -208,16 +237,18 @@ export default function ProductPage() {
       </div>
 
       {/* Mobile sticky bottom bar */}
-      <div className="fixed bottom-0 left-0 right-0 sm:hidden z-40 bg-white border-t border-gray-200 px-4 py-3 flex items-center gap-3">
-        <div className="font-bold text-gray-900">
-          {product.price === 0 ? (
-            <span className="text-emerald-600">{t.common.free}</span>
-          ) : (
-            `¥${product.price.toLocaleString()}`
-          )}
+      {!isOwner && (
+        <div className="fixed bottom-0 left-0 right-0 sm:hidden z-40 bg-white border-t border-gray-200 px-4 py-3 flex items-center gap-3">
+          <div className="font-bold text-gray-900">
+            {product.price === 0 ? (
+              <span className="text-emerald-600">{t.common.free}</span>
+            ) : (
+              `¥${product.price.toLocaleString()}`
+            )}
+          </div>
+          <div className="flex-1">{renderActionBtn(true)}</div>
         </div>
-        <div className="flex-1">{renderActionBtn(true)}</div>
-      </div>
+      )}
 
       {/* Download complete modal */}
       {showDownloadModal && (
@@ -232,12 +263,23 @@ export default function ProductPage() {
             <div className="text-4xl mb-3 text-center">✅</div>
             <h3 className="text-lg font-bold text-gray-900 text-center mb-2">ダウンロード完了</h3>
             <p className="text-sm text-gray-500 text-center mb-5">スキルを取得しました。</p>
-            <button
-              onClick={() => { setShowDownloadModal(false); setDownloadDone(false); }}
-              className="w-full bg-purple-600 text-white font-semibold py-2.5 rounded-lg hover:bg-purple-700 transition-colors"
-            >
-              閉じる
-            </button>
+            <div className="space-y-2">
+              {fileUrl && (
+                <a
+                  href={fileUrl}
+                  download
+                  className="block w-full text-center bg-emerald-600 text-white font-semibold py-2.5 rounded-lg hover:bg-emerald-700 transition-colors"
+                >
+                  {t.purchase.download}
+                </a>
+              )}
+              <button
+                onClick={() => { setShowDownloadModal(false); setDownloadDone(false); setFileUrl(null); }}
+                className="w-full bg-purple-600 text-white font-semibold py-2.5 rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                閉じる
+              </button>
+            </div>
           </div>
         </div>
       )}

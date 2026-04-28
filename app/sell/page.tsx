@@ -1,12 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
+import Link from "next/link";
 import { useLanguage } from "@/components/LanguageContext";
 import { CATEGORIES, getCategoryName } from "@/lib/categories";
 import { TOOLS } from "@/lib/tools";
-import type { Lang } from "@/types";
-
-const LANGS: Lang[] = ["ja", "en", "zh"];
+import type { Product } from "@/types";
 
 const EMPTY_FORM = {
   title: "",
@@ -18,18 +17,17 @@ const EMPTY_FORM = {
   subcategory: "",
   compatible_tools: [] as string[],
   tags: "",
-  content: "",
-  repoUrl: "",
-  lang: "ja" as Lang,
 };
 
 export default function SellPage() {
   const { data: session } = useSession();
   const { t, locale } = useLanguage();
   const [form, setForm] = useState(EMPTY_FORM);
+  const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [newSkill, setNewSkill] = useState<Product | null>(null);
   const [error, setError] = useState("");
+  const fileRef = useRef<HTMLInputElement>(null);
 
   if (!session) {
     return (
@@ -62,7 +60,6 @@ export default function SellPage() {
     setLoading(true);
     setError("");
     try {
-      const price = form.priceType === "free" ? 0 : parseInt(form.price) || 0;
       const tags = form.tags
         .split(",")
         .map((t) => t.trim())
@@ -70,31 +67,30 @@ export default function SellPage() {
         .slice(0, 10);
       const tools = form.compatible_tools.length ? form.compatible_tools : ["other"];
 
-      const res = await fetch("/api/products", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: form.title,
-          shortDescription: form.shortDescription,
-          description: form.description,
-          price,
-          price_type: form.priceType,
-          tool: tools[0],
-          compatible_tools: tools,
-          category: form.category || "other",
-          subcategory: form.subcategory || undefined,
-          tags,
-          content: form.content,
-          repoUrl: form.repoUrl || undefined,
-          lang: form.lang,
-          stars: 0,
-        }),
-      });
-      if (!res.ok) throw new Error("Failed");
-      setSuccess(true);
+      const fd = new FormData();
+      fd.append("title", form.title);
+      fd.append("short_description", form.shortDescription || form.title);
+      fd.append("description", form.description || form.shortDescription || form.title);
+      fd.append("category", form.category || "other");
+      if (form.subcategory) fd.append("subcategory", form.subcategory);
+      fd.append("price_type", form.priceType);
+      if (form.priceType === "paid") fd.append("price", form.price);
+      fd.append("tags", JSON.stringify(tags));
+      fd.append("compatible_tools", JSON.stringify(tools));
+      if (file) fd.append("file", file);
+
+      const res = await fetch("/api/skills", { method: "POST", body: fd });
+      if (!res.ok) {
+        const d = await res.json() as { error?: string };
+        throw new Error(d.error ?? "Failed");
+      }
+      const d = await res.json() as { skill: Product };
+      setNewSkill(d.skill);
       setForm(EMPTY_FORM);
-    } catch {
-      setError(t.common.error);
+      setFile(null);
+      if (fileRef.current) fileRef.current.value = "";
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t.common.error);
     } finally {
       setLoading(false);
     }
@@ -102,16 +98,35 @@ export default function SellPage() {
 
   const inputCls = "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400";
 
+  if (newSkill) {
+    return (
+      <div className="max-w-lg mx-auto px-4 py-20 text-center">
+        <div className="text-5xl mb-4">🎉</div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">{t.sell.success}</h2>
+        <p className="text-gray-500 mb-8">{newSkill.title}</p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link
+            href={`/skills/${newSkill.id}`}
+            className="bg-purple-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            スキルページを見る →
+          </Link>
+          <button
+            onClick={() => setNewSkill(null)}
+            className="border border-gray-200 text-gray-600 font-medium px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            続けて出品する
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
       <h1 className="text-3xl font-bold text-gray-900 mb-2">{t.sell.title}</h1>
       <p className="text-gray-500 mb-8">{t.sell.subtitle}</p>
 
-      {success && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg px-4 py-3 mb-6">
-          {t.sell.success}
-        </div>
-      )}
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 mb-6">
           {error}
@@ -154,7 +169,7 @@ export default function SellPage() {
           />
         </div>
 
-        {/* Price type toggle */}
+        {/* Price type */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">{t.sell.formPriceType}</label>
           <div className="flex gap-2">
@@ -175,7 +190,7 @@ export default function SellPage() {
           </div>
         </div>
 
-        {/* Price (shown only when paid) */}
+        {/* Price */}
         {form.priceType === "paid" && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">{t.sell.formPrice} (¥)</label>
@@ -207,7 +222,7 @@ export default function SellPage() {
           </select>
         </div>
 
-        {/* Subcategory (dynamic) */}
+        {/* Subcategory */}
         {selectedCat && selectedCat.subcategories.length > 0 && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">{t.sell.formSubcategory}</label>
@@ -226,7 +241,7 @@ export default function SellPage() {
           </div>
         )}
 
-        {/* Tools (multi-select checkboxes) */}
+        {/* Tools */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">{t.sell.formTools}</label>
           <div className="flex flex-wrap gap-2">
@@ -250,7 +265,8 @@ export default function SellPage() {
         {/* Tags */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t.sell.formTags} <span className="text-gray-400 font-normal text-xs">(comma separated, max 10)</span>
+            {t.sell.formTags}{" "}
+            <span className="text-gray-400 font-normal text-xs">(comma separated, max 10)</span>
           </label>
           <input
             type="text"
@@ -261,47 +277,29 @@ export default function SellPage() {
           />
         </div>
 
-        {/* Content */}
+        {/* SKILL.md file upload */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">{t.sell.formContent}</label>
-          <textarea
-            value={form.content}
-            onChange={(e) => setForm({ ...form, content: e.target.value })}
-            rows={8}
-            className={`${inputCls} font-mono`}
-            required
-          />
-        </div>
-
-        {/* Repo URL */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">{t.sell.formRepoUrl}</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            SKILL.md ファイル
+            <span className="text-gray-400 font-normal text-xs ml-1">(任意・.md)</span>
+          </label>
           <input
-            type="url"
-            value={form.repoUrl}
-            onChange={(e) => setForm({ ...form, repoUrl: e.target.value })}
-            className={inputCls}
-            placeholder="https://github.com/..."
+            ref={fileRef}
+            type="file"
+            accept=".md,text/markdown,text/plain"
+            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 cursor-pointer"
           />
-        </div>
-
-        {/* Language */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">{t.sell.formLang}</label>
-          <select
-            value={form.lang}
-            onChange={(e) => setForm({ ...form, lang: e.target.value as Lang })}
-            className={`${inputCls} bg-white`}
-          >
-            {LANGS.map((l) => (
-              <option key={l} value={l}>{l.toUpperCase()}</option>
-            ))}
-          </select>
+          {file && (
+            <p className="text-xs text-emerald-600 mt-1">
+              選択済み: {file.name} ({Math.round(file.size / 1024)} KB)
+            </p>
+          )}
         </div>
 
         <button
           type="submit"
-          disabled={loading || !form.title || !form.content}
+          disabled={loading || !form.title}
           className="w-full bg-purple-600 text-white font-semibold py-3 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? t.common.loading : t.sell.submit}

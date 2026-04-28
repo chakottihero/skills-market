@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { readProducts } from "@/lib/products";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export async function POST(
   _req: NextRequest,
@@ -12,12 +12,44 @@ export async function POST(
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const product = readProducts().find((p) => p.id === id);
-  if (!product) {
+
+  const login = (session.user as { login?: string }).login ?? session.user.name ?? "unknown";
+
+  const { data: skill } = await supabaseAdmin
+    .from("skills")
+    .select("price_type, price, skill_file_path")
+    .eq("id", id)
+    .single();
+
+  if (!skill) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
-  if (product.price_type !== "free" && product.price !== 0) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+  const isFree = skill.price_type === "free" || skill.price === 0;
+
+  if (!isFree) {
+    const { data: purchase } = await supabaseAdmin
+      .from("purchases")
+      .select("id")
+      .eq("skill_id", id)
+      .eq("buyer_id", login)
+      .eq("status", "completed")
+      .maybeSingle();
+
+    if (!purchase) {
+      return NextResponse.json({ error: "Purchase required" }, { status: 403 });
+    }
   }
-  return NextResponse.json({ success: true, skillId: id });
+
+  await supabaseAdmin.from("downloads").insert({ skill_id: id, user_id: login });
+
+  let fileUrl: string | null = null;
+  if (skill.skill_file_path) {
+    const { data: signed } = await supabaseAdmin.storage
+      .from("skill-files")
+      .createSignedUrl(skill.skill_file_path, 60);
+    fileUrl = signed?.signedUrl ?? null;
+  }
+
+  return NextResponse.json({ success: true, skillId: id, fileUrl });
 }

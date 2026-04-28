@@ -38,7 +38,7 @@ export default function UserProfilePage() {
         if (!r.ok) throw new Error("not found");
         return r.json();
       }),
-      fetch(`/api/products?author=${username}`).then((r) => r.json()),
+      fetch(`/api/skills?seller_id=${username}`).then((r) => r.json()),
     ])
       .then(([ud, pd]) => {
         setProfile(ud.profile as UserProfile);

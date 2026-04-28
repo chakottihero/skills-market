@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export async function POST(req: NextRequest) {
   const { sessionId } = await req.json() as { sessionId: string };
@@ -11,6 +12,11 @@ export async function POST(req: NextRequest) {
   try {
     const session = await stripe.checkout.sessions.retrieve(sessionId);
     if (session.payment_status === "paid") {
+      await supabaseAdmin
+        .from("purchases")
+        .update({ status: "completed" })
+        .eq("stripe_session_id", sessionId);
+
       return NextResponse.json({
         success: true,
         skillId: session.metadata?.skillId ?? null,

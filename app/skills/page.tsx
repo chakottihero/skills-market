@@ -40,7 +40,7 @@ function SkillsPageInner() {
     if (tool)        params.set("tool", tool);
     if (priceType)   params.set("price_type", priceType);
     if (query)       params.set("q", query);
-    const res = await fetch(`/api/products?${params}`);
+    const res = await fetch(`/api/skills?${params}`);
     const data = await res.json();
     setProducts(data.products as Product[]);
     setLoading(false);

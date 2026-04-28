@@ -1,0 +1,35 @@
+import type { Product, SkillRow } from "@/types";
+
+export function skillToProduct(row: SkillRow): Product {
+  return {
+    id: row.id,
+    title: row.title,
+    title_en: row.title_en,
+    title_zh: row.title_zh,
+    shortDescription: row.short_description,
+    shortDescription_en: row.short_description_en,
+    shortDescription_zh: row.short_description_zh,
+    description: row.description,
+    description_en: row.description_en,
+    description_zh: row.description_zh,
+    price: row.price,
+    price_type: row.price_type,
+    tool: (row.compatible_tools?.[0] ?? "other") as Product["tool"],
+    compatible_tools: row.compatible_tools ?? [],
+    category: row.category,
+    subcategory: row.subcategory,
+    tags: row.tags ?? [],
+    author: {
+      name: row.seller_name,
+      login: row.seller_id,
+      githubUrl: `https://github.com/${row.seller_id}`,
+      avatar: row.seller_avatar ?? "",
+    },
+    content: "",
+    repoUrl: "",
+    stars: 0,
+    purchases: 0,
+    createdAt: row.created_at,
+    lang: "ja",
+  };
+}

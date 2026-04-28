@@ -10,7 +10,7 @@ export default function CategoriesPage() {
   const [counts, setCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
-    fetch("/api/products")
+    fetch("/api/skills")
       .then((r) => r.json())
       .then((d) => {
         const c: Record<string, number> = {};

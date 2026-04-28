@@ -14,7 +14,7 @@ export default function HomePage() {
   const [stats, setStats] = useState({ skills: 0, sellers: 0 });
 
   useEffect(() => {
-    fetch("/api/products?sort=popular")
+    fetch("/api/skills?sort=popular")
       .then((r) => r.json())
       .then((d) => {
         const products = d.products as Product[];

@@ -99,3 +99,50 @@ export interface UserProfile {
 export interface UsersData {
   users: UserProfile[];
 }
+
+// ── Supabase Skill Row ────────────────────────────────────────────────────────
+
+export interface SkillRow {
+  id: string;
+  title: string;
+  title_en?: string;
+  title_zh?: string;
+  short_description: string;
+  short_description_en?: string;
+  short_description_zh?: string;
+  description: string;
+  description_en?: string;
+  description_zh?: string;
+  category: string;
+  subcategory?: string;
+  price_type: PriceType;
+  price: number;
+  tags: string[];
+  compatible_tools: string[];
+  skill_file_path?: string;
+  seller_id: string;
+  seller_name: string;
+  seller_avatar?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PurchaseRow {
+  id: string;
+  skill_id: string;
+  buyer_id: string;
+  buyer_email?: string;
+  stripe_session_id?: string;
+  price: number;
+  status: "pending" | "completed" | "failed";
+  created_at: string;
+  skills?: { title: string; price: number; category: string };
+}
+
+export interface DownloadRow {
+  id: string;
+  skill_id: string;
+  user_id: string;
+  created_at: string;
+  skills?: { title: string; category: string };
+}
