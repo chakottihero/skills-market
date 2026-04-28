@@ -1,14 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { supabaseAdmin, supabaseConfigured } from "@/lib/supabase-admin";
 import { skillToProduct } from "@/lib/skillMapper";
 import type { SkillRow } from "@/types";
-
-function supabaseConfigured(): boolean {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-  return url.startsWith("https://") && !url.includes("placeholder");
-}
 
 export async function GET(req: NextRequest) {
   if (!supabaseConfigured()) {
