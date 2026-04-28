@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import { useLanguage } from "@/components/LanguageContext";
@@ -15,19 +15,20 @@ const EMPTY_FORM = {
   price: "",
   category: "",
   subcategory: "",
-  compatible_tools: [] as string[],
+  ai_tools: [] as string[],
   tags: "",
+  skill_content: "",
+  github_url: "",
+  language: "ja" as "ja" | "en" | "zh",
 };
 
 export default function SellPage() {
   const { data: session } = useSession();
   const { t, locale } = useLanguage();
   const [form, setForm] = useState(EMPTY_FORM);
-  const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [newSkill, setNewSkill] = useState<Product | null>(null);
   const [error, setError] = useState("");
-  const fileRef = useRef<HTMLInputElement>(null);
 
   if (!session) {
     return (
@@ -49,9 +50,9 @@ export default function SellPage() {
   const toggleTool = (id: string) => {
     setForm((f) => ({
       ...f,
-      compatible_tools: f.compatible_tools.includes(id)
-        ? f.compatible_tools.filter((t) => t !== id)
-        : [...f.compatible_tools, id],
+      ai_tools: f.ai_tools.includes(id)
+        ? f.ai_tools.filter((t) => t !== id)
+        : [...f.ai_tools, id],
     }));
   };
 
@@ -65,21 +66,27 @@ export default function SellPage() {
         .map((t) => t.trim())
         .filter(Boolean)
         .slice(0, 10);
-      const tools = form.compatible_tools.length ? form.compatible_tools : ["other"];
 
-      const fd = new FormData();
-      fd.append("title", form.title);
-      fd.append("short_description", form.shortDescription || form.title);
-      fd.append("description", form.description || form.shortDescription || form.title);
-      fd.append("category", form.category || "other");
-      if (form.subcategory) fd.append("subcategory", form.subcategory);
-      fd.append("price_type", form.priceType);
-      if (form.priceType === "paid") fd.append("price", form.price);
-      fd.append("tags", JSON.stringify(tags));
-      fd.append("compatible_tools", JSON.stringify(tools));
-      if (file) fd.append("file", file);
+      const body = {
+        title: form.title,
+        short_description: form.shortDescription || form.title,
+        description: form.description || form.shortDescription || form.title,
+        category: form.category || "other",
+        subcategory: form.subcategory || undefined,
+        price_type: form.priceType,
+        price: form.priceType === "paid" ? Number(form.price) : 0,
+        tags,
+        ai_tools: form.ai_tools,
+        skill_content: form.skill_content || undefined,
+        github_url: form.github_url || undefined,
+        language: form.language,
+      };
 
-      const res = await fetch("/api/skills", { method: "POST", body: fd });
+      const res = await fetch("/api/skills", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
       if (!res.ok) {
         const d = await res.json() as { error?: string };
         throw new Error(d.error ?? "Failed");
@@ -87,8 +94,6 @@ export default function SellPage() {
       const d = await res.json() as { skill: Product };
       setNewSkill(d.skill);
       setForm(EMPTY_FORM);
-      setFile(null);
-      if (fileRef.current) fileRef.current.value = "";
     } catch (err) {
       setError(err instanceof Error ? err.message : t.common.error);
     } finally {
@@ -251,7 +256,7 @@ export default function SellPage() {
                 type="button"
                 onClick={() => toggleTool(tk.id)}
                 className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${
-                  form.compatible_tools.includes(tk.id)
+                  form.ai_tools.includes(tk.id)
                     ? `${tk.badgeClass} border-transparent`
                     : "bg-white text-gray-500 border-gray-200 hover:border-gray-400"
                 }`}
@@ -277,24 +282,48 @@ export default function SellPage() {
           />
         </div>
 
-        {/* SKILL.md file upload */}
+        {/* GitHub URL */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            SKILL.md ファイル
-            <span className="text-gray-400 font-normal text-xs ml-1">(任意・.md)</span>
+            GitHub URL
+            <span className="text-gray-400 font-normal text-xs ml-1">(任意)</span>
           </label>
           <input
-            ref={fileRef}
-            type="file"
-            accept=".md,text/markdown,text/plain"
-            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-            className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 cursor-pointer"
+            type="url"
+            value={form.github_url}
+            onChange={(e) => setForm({ ...form, github_url: e.target.value })}
+            className={inputCls}
+            placeholder="https://github.com/yourname/repo"
           />
-          {file && (
-            <p className="text-xs text-emerald-600 mt-1">
-              選択済み: {file.name} ({Math.round(file.size / 1024)} KB)
-            </p>
-          )}
+        </div>
+
+        {/* Language */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">言語 / Language</label>
+          <select
+            value={form.language}
+            onChange={(e) => setForm({ ...form, language: e.target.value as "ja" | "en" | "zh" })}
+            className={`${inputCls} bg-white`}
+          >
+            <option value="ja">日本語</option>
+            <option value="en">English</option>
+            <option value="zh">中文</option>
+          </select>
+        </div>
+
+        {/* SKILL.md content */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            SKILL.md の内容
+            <span className="text-gray-400 font-normal text-xs ml-1">(任意・Markdown形式)</span>
+          </label>
+          <textarea
+            value={form.skill_content}
+            onChange={(e) => setForm({ ...form, skill_content: e.target.value })}
+            rows={8}
+            className={`${inputCls} font-mono text-xs`}
+            placeholder={"# スキル名\n\n## 概要\n\n## 使い方\n\n## 例"}
+          />
         </div>
 
         <button
