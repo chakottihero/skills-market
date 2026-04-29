@@ -6,6 +6,12 @@ const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "placeholder";
 
 export const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
   auth: { autoRefreshToken: false, persistSession: false },
+  global: {
+    // Bypass Next.js fetch cache — prevents "fetch failed" caused by
+    // Next.js intercepting requests to external services.
+    fetch: (url, options) =>
+      fetch(url, { ...options, cache: "no-store" }),
+  },
 });
 
 // Check SUPABASE_SERVICE_ROLE_KEY (server-only, never build-time inlined)
