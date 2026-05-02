@@ -34,10 +34,16 @@ export interface Product {
   author: Author;
   content: string;
   repoUrl: string;
+  images?: string[];
   stars?: number;
   purchases?: number;
   createdAt: string;
   lang: Lang;
+  avg_rating?: number;
+  rating_count?: number;
+  like_count?: number;
+  bookmark_count?: number;
+  previewContent?: boolean;
 }
 
 export interface ProductsData {
@@ -92,8 +98,10 @@ export interface UserProfile {
     twitter?: string;
     website?: string;
   };
+  achievements?: string;
   createdAt: string;
   updatedAt: string;
+  terms_accepted_at?: string;
 }
 
 export interface UsersData {
@@ -120,11 +128,17 @@ export interface SkillRow {
   tags: string[];
   compatible_tools: string[];
   skill_file_path?: string;
+  preview_content?: boolean;
+  images?: string[];
   seller_id: string;
   seller_name: string;
   seller_avatar?: string;
   created_at: string;
   updated_at: string;
+  avg_rating?: number;
+  rating_count?: number;
+  like_count?: number;
+  bookmark_count?: number;
 }
 
 export interface PurchaseRow {

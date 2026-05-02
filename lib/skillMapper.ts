@@ -27,9 +27,15 @@ export function skillToProduct(row: SkillRow): Product {
     },
     content: "",
     repoUrl: "",
+    images: row.images ?? [],
     stars: 0,
     purchases: 0,
     createdAt: row.created_at,
     lang: "ja",
+    avg_rating: row.avg_rating ?? 0,
+    rating_count: row.rating_count ?? 0,
+    like_count: row.like_count ?? 0,
+    bookmark_count: row.bookmark_count ?? 0,
+    previewContent: row.preview_content ?? false,
   };
 }

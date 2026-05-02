@@ -403,8 +403,7 @@ export const CATEGORY_MAP = Object.fromEntries(
 ) as Record<string, Category>;
 
 export function getCategoryName(id: string, locale: "ja" | "en" | "zh"): string {
-  const cat = CATEGORY_MAP[id];
-  if (!cat) return id;
+  const cat = CATEGORY_MAP[id] ?? CATEGORY_MAP["other"];
   return locale === "en" ? cat.name_en : locale === "zh" ? cat.name_zh : cat.name_ja;
 }
 

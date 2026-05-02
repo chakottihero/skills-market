@@ -35,6 +35,10 @@ export async function GET(req: NextRequest) {
 
     let products = (data as SkillRow[]).map(skillToProduct);
 
+    if (sort === "popular") {
+      products = products.sort((a, b) => (b.like_count ?? 0) - (a.like_count ?? 0));
+    }
+
     if (q) {
       products = products.filter((p) =>
         p.title.toLowerCase().includes(q) ||
@@ -77,8 +81,12 @@ export async function POST(req: NextRequest) {
     tags?: string[];
     ai_tools?: string[];
     skill_content?: string;
+    file_path?: string;
     github_url?: string;
     language?: string;
+    images?: string[];
+    description_en?: string;
+    preview_content?: boolean;
   };
 
   try {
@@ -98,8 +106,12 @@ export async function POST(req: NextRequest) {
     tags = [],
     ai_tools = [],
     skill_content,
+    file_path,
     github_url,
     language,
+    images = [],
+    description_en,
+    preview_content = false,
   } = body;
 
   if (!title) {
@@ -109,9 +121,9 @@ export async function POST(req: NextRequest) {
   const price = price_type === "free" ? 0 : (rawPrice ?? 0);
   const compatibleTools = ai_tools.length ? ai_tools : ["other"];
 
-  let skillFilePath: string | null = null;
+  let skillFilePath: string | null = file_path || null;
 
-  if (skill_content && skill_content.trim()) {
+  if (!skillFilePath && skill_content && skill_content.trim()) {
     try {
       const encoder = new TextEncoder();
       const bytes = encoder.encode(skill_content);
@@ -131,26 +143,39 @@ export async function POST(req: NextRequest) {
     ? `${fullDesc}\n\nGitHub: ${github_url}`
     : fullDesc;
 
+  const sellerName = session.user?.name ?? login;
+  const sellerAvatar = session.user?.image ?? null;
+
+  const tryInsert = async (withPreview: boolean) => {
+    const insertRow: Record<string, unknown> = {
+      title,
+      short_description: shortDesc,
+      description: descWithMeta,
+      category,
+      subcategory: subcategory || null,
+      price_type,
+      price,
+      tags,
+      compatible_tools: compatibleTools,
+      skill_file_path: skillFilePath,
+      seller_id: login,
+      seller_name: sellerName,
+      seller_avatar: sellerAvatar,
+    };
+    if (withPreview) insertRow.preview_content = preview_content;
+    if (description_en) insertRow.description_en = description_en;
+    if (images.length > 0) insertRow.images = images;
+
+    return supabaseAdmin.from("skills").insert(insertRow).select().single();
+  };
+
   try {
-    const { data, error } = await supabaseAdmin
-      .from("skills")
-      .insert({
-        title,
-        short_description: shortDesc,
-        description: descWithMeta,
-        category,
-        subcategory: subcategory || null,
-        price_type,
-        price,
-        tags,
-        compatible_tools: compatibleTools,
-        skill_file_path: skillFilePath,
-        seller_id: login,
-        seller_name: session.user.name ?? login,
-        seller_avatar: session.user.image ?? null,
-      })
-      .select()
-      .single();
+    let { data, error } = await tryInsert(true);
+
+    // If preview_content column doesn't exist yet, retry without it
+    if (error?.message?.includes("preview_content")) {
+      ({ data, error } = await tryInsert(false));
+    }
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
