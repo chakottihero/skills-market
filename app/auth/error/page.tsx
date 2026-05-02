@@ -67,7 +67,7 @@ function ErrorContent() {
             <p className="font-semibold">確認事項:</p>
             <p>・GitHub OAuth App の Authorization callback URL</p>
             <p className="font-mono break-all pl-2">
-              https://skills-market-seven.vercel.app/api/auth/callback/github
+              https://aiskill-market.com/api/auth/callback/github
             </p>
             <p>・Vercel 環境変数 GITHUB_ID / GITHUB_SECRET が正しいか</p>
           </div>
