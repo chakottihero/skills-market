@@ -19,8 +19,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   }
 
+  const login = (session.user as { login?: string }).login ?? session.user?.name ?? "unknown";
+
   if (priceType === "free") {
     return NextResponse.json({ success: true, free: true });
+  }
+
+  // Duplicate purchase check
+  const { data: existing } = await supabaseAdmin
+    .from("purchases")
+    .select("id, status")
+    .eq("skill_id", skillId)
+    .eq("buyer_id", login)
+    .maybeSingle();
+
+  if (existing?.status === "completed") {
+    return NextResponse.json({ error: "already_purchased" }, { status: 409 });
   }
 
   const { data: skill } = await supabaseAdmin
@@ -33,7 +47,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Product not found" }, { status: 404 });
   }
 
-  const login = (session.user as { login?: string }).login ?? session.user?.name ?? "unknown";
   const origin = req.headers.get("origin") ?? process.env.NEXTAUTH_URL ?? "http://localhost:3000";
 
   const checkoutSession = await stripe.checkout.sessions.create({
@@ -48,19 +61,24 @@ export async function POST(req: NextRequest) {
         },
       },
     ],
-    success_url: `${origin}/purchase/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${origin}/skills/${skillId}`,
-    metadata: { skillId },
+    success_url: `${origin}/purchases/${"{CHECKOUT_SESSION_ID}"}/success`,
+    cancel_url: `${origin}/skills/${skillId}?canceled=true`,
+    customer_email: session.user?.email ?? undefined,
+    metadata: { skillId, buyer_id: login },
   });
 
-  await supabaseAdmin.from("purchases").insert({
-    skill_id: skillId,
-    buyer_id: login,
-    buyer_email: session.user?.email ?? null,
-    stripe_session_id: checkoutSession.id,
-    price: skill.price,
-    status: "pending",
-  });
+  // Upsert pending purchase (overwrite any previous pending)
+  await supabaseAdmin.from("purchases").upsert(
+    {
+      skill_id: skillId,
+      buyer_id: login,
+      buyer_email: session.user?.email ?? null,
+      stripe_session_id: checkoutSession.id,
+      price: skill.price,
+      status: "pending",
+    },
+    { onConflict: "buyer_id,skill_id", ignoreDuplicates: false }
+  );
 
   return NextResponse.json({ url: checkoutSession.url });
 }

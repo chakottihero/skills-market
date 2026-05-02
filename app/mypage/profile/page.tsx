@@ -1,10 +1,10 @@
 "use client";
-import { useEffect, useState, useCallback, KeyboardEvent } from "react";
+import { useEffect, useState, useCallback, useRef, KeyboardEvent, ChangeEvent } from "react";
 import { useSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import { useLanguage } from "@/components/LanguageContext";
-import type { UserProfile, Availability, Tool, WorkEntry, EducationEntry, AwardEntry, PortfolioEntry } from "@/types";
+import type { UserProfile, Tool } from "@/types";
 
 const SPECIALTIES = [
   "Webフロントエンド", "バックエンド・API", "開発ツール・環境", "AI・機械学習",
@@ -23,16 +23,17 @@ const TOOLS: { value: Tool; label: string }[] = [
   { value: "other", label: "その他" },
 ];
 
-const AVAIL: { value: Availability; label: string; cls: string }[] = [
-  { value: "available", label: "対応可能", cls: "bg-emerald-100 text-emerald-700 border-emerald-300" },
-  { value: "busy",      label: "多忙",     cls: "bg-amber-100 text-amber-700 border-amber-300" },
-  { value: "closed",    label: "受付停止", cls: "bg-red-100 text-red-700 border-red-300" },
-];
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <h2 className="text-base font-semibold text-gray-800 border-b border-gray-100 pb-2 mb-4">{children}</h2>;
+  return (
+    <h2 className="text-base font-semibold text-gray-800 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2 mb-4">
+      {children}
+    </h2>
+  );
 }
 
 function Input({ label, value, onChange, placeholder, maxLength, type = "text" }: {
@@ -41,14 +42,14 @@ function Input({ label, value, onChange, placeholder, maxLength, type = "text" }
 }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{label}</label>
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         maxLength={maxLength}
-        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+        className="w-full border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-400"
       />
       {maxLength && (
         <div className="text-right text-xs text-gray-400 mt-0.5">{value.length}/{maxLength}</div>
@@ -63,14 +64,14 @@ function Textarea({ label, value, onChange, rows = 4, maxLength, placeholder }: 
 }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{label}</label>
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
         rows={rows}
         maxLength={maxLength}
         placeholder={placeholder}
-        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 font-mono"
+        className="w-full border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-400 font-mono"
       />
       {maxLength && (
         <div className="text-right text-xs text-gray-400 mt-0.5">{value.length}/{maxLength}</div>
@@ -79,17 +80,13 @@ function Textarea({ label, value, onChange, rows = 4, maxLength, placeholder }: 
   );
 }
 
-// ── TagInput ─────────────────────────────────────────────────────────────────
-
 function TagInput({ label, tags, onChange, max = 15, placeholder }: {
   label: string; tags: string[]; onChange: (v: string[]) => void; max?: number; placeholder?: string;
 }) {
   const [input, setInput] = useState("");
   const add = () => {
     const v = input.trim();
-    if (v && !tags.includes(v) && tags.length < max) {
-      onChange([...tags, v]);
-    }
+    if (v && !tags.includes(v) && tags.length < max) onChange([...tags, v]);
     setInput("");
   };
   const onKey = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -97,7 +94,7 @@ function TagInput({ label, tags, onChange, max = 15, placeholder }: {
   };
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{label}</label>
       <div className="flex flex-wrap gap-1.5 mb-2">
         {tags.map((t) => (
           <span key={t} className="flex items-center gap-1 bg-purple-100 text-purple-700 text-xs px-2 py-1 rounded-full">
@@ -113,14 +110,12 @@ function TagInput({ label, tags, onChange, max = 15, placeholder }: {
         onKeyDown={onKey}
         onBlur={add}
         placeholder={placeholder ?? `追加（Enter/カンマで確定）${tags.length}/${max}`}
-        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+        className="w-full border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-400"
         disabled={tags.length >= max}
       />
     </div>
   );
 }
-
-// ── Checkbox group ────────────────────────────────────────────────────────────
 
 function CheckGroup({ label, options, selected, onChange, max }: {
   label: string; options: string[]; selected: string[];
@@ -156,107 +151,182 @@ function CheckGroup({ label, options, selected, onChange, max }: {
   );
 }
 
-// ── Array entry editors ───────────────────────────────────────────────────────
+// ── Avatar upload section ──────────────────────────────────────────────────────
 
-function WorkEditor({ entries, onChange }: { entries: WorkEntry[]; onChange: (v: WorkEntry[]) => void }) {
-  const update = (i: number, f: Partial<WorkEntry>) =>
-    onChange(entries.map((e, idx) => idx === i ? { ...e, ...f } : e));
-  const remove = (i: number) => onChange(entries.filter((_, idx) => idx !== i));
-  const add = () => onChange([...entries, { company: "", role: "", period: "" }]);
+function AvatarSection({ avatar, onAvatarChange }: {
+  avatar: string;
+  onAvatarChange: (url: string) => void;
+}) {
+  const [tab, setTab] = useState<"upload" | "url">("upload");
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleFile = useCallback(async (file: File) => {
+    setError(null);
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setError("対応形式: JPG, PNG, GIF, WebP");
+      return;
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      setError("ファイルサイズは2MB以下にしてください");
+      return;
+    }
+
+    // local preview
+    const reader = new FileReader();
+    reader.onload = (e) => setPreview(e.target?.result as string);
+    reader.readAsDataURL(file);
+
+    setUploading(true);
+    setProgress(10);
+
+    try {
+      // get signed upload URL
+      const res = await fetch("/api/upload-avatar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename: file.name }),
+      });
+
+      if (!res.ok) {
+        const d = await res.json() as { error?: string };
+        throw new Error(d.error ?? "アップロードURLの取得に失敗しました");
+      }
+
+      const { signedUrl, publicUrl } = await res.json() as { signedUrl: string; publicUrl: string };
+      setProgress(40);
+
+      // upload to Supabase Storage
+      const uploadRes = await fetch(signedUrl, {
+        method: "PUT",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+
+      if (!uploadRes.ok) throw new Error("アップロードに失敗しました");
+      setProgress(100);
+
+      onAvatarChange(publicUrl);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "エラーが発生しました");
+      setPreview(null);
+    } finally {
+      setUploading(false);
+      setProgress(0);
+    }
+  }, [onAvatarChange]);
+
+  const onFileInput = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleFile(file);
+    e.target.value = "";
+  };
+
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleFile(file);
+  };
+
+  const currentImage = preview || avatar;
+
   return (
-    <div className="space-y-3">
-      {entries.map((e, i) => (
-        <div key={i} className="border border-gray-200 rounded-lg p-3 space-y-2 bg-gray-50">
-          <div className="grid grid-cols-2 gap-2">
-            <input placeholder="会社名・組織名" value={e.company} onChange={(ev) => update(i, { company: ev.target.value })}
-              className="border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400" />
-            <input placeholder="役職・肩書" value={e.role} onChange={(ev) => update(i, { role: ev.target.value })}
-              className="border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400" />
+    <div>
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">プロフィール画像</label>
+
+      {/* Preview */}
+      {currentImage && (
+        <div className="flex items-center gap-4 mb-4">
+          <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-purple-200 flex-shrink-0">
+            <Image src={currentImage} alt="avatar preview" fill className="object-cover" unoptimized />
           </div>
-          <input placeholder="期間（例: 2022-2024）" value={e.period} onChange={(ev) => update(i, { period: ev.target.value })}
-            className="w-full border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400" />
-          <button onClick={() => remove(i)} className="text-xs text-red-500 hover:text-red-700">削除</button>
+          <span className="text-xs text-gray-400">プレビュー</span>
         </div>
-      ))}
-      {entries.length < 5 && (
-        <button onClick={add} type="button" className="text-sm text-purple-600 hover:underline">+ 職歴を追加</button>
       )}
-    </div>
-  );
-}
 
-function EduEditor({ entries, onChange }: { entries: EducationEntry[]; onChange: (v: EducationEntry[]) => void }) {
-  const update = (i: number, f: Partial<EducationEntry>) =>
-    onChange(entries.map((e, idx) => idx === i ? { ...e, ...f } : e));
-  const remove = (i: number) => onChange(entries.filter((_, idx) => idx !== i));
-  const add = () => onChange([...entries, { school: "", detail: "", period: "" }]);
-  return (
-    <div className="space-y-3">
-      {entries.map((e, i) => (
-        <div key={i} className="border border-gray-200 rounded-lg p-3 space-y-2 bg-gray-50">
-          <div className="grid grid-cols-2 gap-2">
-            <input placeholder="学校名" value={e.school} onChange={(ev) => update(i, { school: ev.target.value })}
-              className="border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400" />
-            <input placeholder="詳細（専攻・学位など）" value={e.detail} onChange={(ev) => update(i, { detail: ev.target.value })}
-              className="border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400" />
+      {/* Tab switcher */}
+      <div className="flex rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden mb-3 w-fit">
+        <button
+          type="button"
+          onClick={() => setTab("upload")}
+          className={`px-4 py-1.5 text-sm font-medium transition-colors ${
+            tab === "upload"
+              ? "bg-purple-600 text-white"
+              : "bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
+          }`}
+        >
+          画像をアップロード
+        </button>
+        <button
+          type="button"
+          onClick={() => setTab("url")}
+          className={`px-4 py-1.5 text-sm font-medium transition-colors border-l border-gray-200 dark:border-gray-600 ${
+            tab === "url"
+              ? "bg-purple-600 text-white"
+              : "bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
+          }`}
+        >
+          URLを入力
+        </button>
+      </div>
+
+      {tab === "upload" ? (
+        <div>
+          {/* Drop zone */}
+          <div
+            onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={onDrop}
+            onClick={() => fileRef.current?.click()}
+            className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${
+              dragging
+                ? "border-purple-500 bg-purple-50 dark:bg-purple-900/20"
+                : "border-gray-200 dark:border-gray-600 hover:border-purple-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+            }`}
+          >
+            {uploading ? (
+              <div className="space-y-2">
+                <div className="text-sm text-gray-500">アップロード中...</div>
+                <div className="w-full bg-gray-200 rounded-full h-1.5">
+                  <div
+                    className="bg-purple-500 h-1.5 rounded-full transition-all duration-300"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="text-3xl mb-2">📷</div>
+                <p className="text-sm text-gray-600 dark:text-gray-300">クリックまたはドラッグ&ドロップ</p>
+                <p className="text-xs text-gray-400 mt-1">JPG / PNG / GIF / WebP · 最大2MB</p>
+              </>
+            )}
           </div>
-          <input placeholder="期間（例: 2018-2022）" value={e.period} onChange={(ev) => update(i, { period: ev.target.value })}
-            className="w-full border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400" />
-          <button onClick={() => remove(i)} className="text-xs text-red-500 hover:text-red-700">削除</button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/jpeg,image/png,image/gif,image/webp"
+            onChange={onFileInput}
+            className="hidden"
+          />
+          {error && (
+            <p className="text-xs text-red-500 mt-2">{error}</p>
+          )}
         </div>
-      ))}
-      {entries.length < 3 && (
-        <button onClick={add} type="button" className="text-sm text-purple-600 hover:underline">+ 学歴を追加</button>
-      )}
-    </div>
-  );
-}
-
-function AwardEditor({ entries, onChange }: { entries: AwardEntry[]; onChange: (v: AwardEntry[]) => void }) {
-  const update = (i: number, f: Partial<AwardEntry>) =>
-    onChange(entries.map((e, idx) => idx === i ? { ...e, ...f } : e));
-  const remove = (i: number) => onChange(entries.filter((_, idx) => idx !== i));
-  const add = () => onChange([...entries, { title: "", year: String(new Date().getFullYear()) }]);
-  return (
-    <div className="space-y-3">
-      {entries.map((e, i) => (
-        <div key={i} className="border border-gray-200 rounded-lg p-3 space-y-2 bg-gray-50">
-          <div className="grid grid-cols-3 gap-2">
-            <input placeholder="タイトル" value={e.title} onChange={(ev) => update(i, { title: ev.target.value })}
-              className="col-span-2 border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400" />
-            <input placeholder="年" value={e.year} onChange={(ev) => update(i, { year: ev.target.value })}
-              className="border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400" />
-          </div>
-          <button onClick={() => remove(i)} className="text-xs text-red-500 hover:text-red-700">削除</button>
-        </div>
-      ))}
-      {entries.length < 5 && (
-        <button onClick={add} type="button" className="text-sm text-purple-600 hover:underline">+ 受賞歴を追加</button>
-      )}
-    </div>
-  );
-}
-
-function PortfolioEditor({ entries, onChange }: { entries: PortfolioEntry[]; onChange: (v: PortfolioEntry[]) => void }) {
-  const update = (i: number, f: Partial<PortfolioEntry>) =>
-    onChange(entries.map((e, idx) => idx === i ? { ...e, ...f } : e));
-  const remove = (i: number) => onChange(entries.filter((_, idx) => idx !== i));
-  const add = () => onChange([...entries, { url: "", title: "", description: "" }]);
-  return (
-    <div className="space-y-3">
-      {entries.map((e, i) => (
-        <div key={i} className="border border-gray-200 rounded-lg p-3 space-y-2 bg-gray-50">
-          <input placeholder="URL（https://...）" value={e.url} onChange={(ev) => update(i, { url: ev.target.value })}
-            className="w-full border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400" />
-          <input placeholder="タイトル" value={e.title} onChange={(ev) => update(i, { title: ev.target.value })}
-            className="w-full border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400" />
-          <textarea placeholder="説明" value={e.description} onChange={(ev) => update(i, { description: ev.target.value })}
-            rows={2} className="w-full border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400 resize-none" />
-          <button onClick={() => remove(i)} className="text-xs text-red-500 hover:text-red-700">削除</button>
-        </div>
-      ))}
-      {entries.length < 5 && (
-        <button onClick={add} type="button" className="text-sm text-purple-600 hover:underline">+ ポートフォリオを追加</button>
+      ) : (
+        <input
+          type="text"
+          value={avatar}
+          onChange={(e) => onAvatarChange(e.target.value)}
+          placeholder="https://avatars.githubusercontent.com/..."
+          className="w-full border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-400"
+        />
       )}
     </div>
   );
@@ -284,6 +354,7 @@ export default function ProfileEditPage() {
     availability: "available",
     schedule: "",
     sns: { github: "", twitter: "", website: "" },
+    achievements: "",
     createdAt: "",
     updatedAt: "",
   });
@@ -291,6 +362,7 @@ export default function ProfileEditPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [achievementsOpen, setAchievementsOpen] = useState(false);
 
   const set = useCallback(<K extends keyof UserProfile>(key: K, val: UserProfile[K]) => {
     setForm((f) => ({ ...f, [key]: val }));
@@ -312,7 +384,12 @@ export default function ProfileEditPage() {
         return null;
       })
       .then((d) => {
-        if (d) { setForm(d.profile as UserProfile); setLoaded(true); }
+        if (d) {
+          const p = d.profile as UserProfile;
+          setForm(p);
+          if (p.achievements) setAchievementsOpen(true);
+          setLoaded(true);
+        }
       });
   }, [login, session]);
 
@@ -353,7 +430,7 @@ export default function ProfileEditPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <Link href="/mypage" className="text-sm text-gray-500 hover:text-gray-700">← {t.mypage.title}</Link>
-          <h1 className="text-2xl font-bold text-gray-900 mt-1">{t.profile.edit}</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{t.profile.edit}</h1>
         </div>
         <div className="flex items-center gap-3">
           {login && (
@@ -372,111 +449,132 @@ export default function ProfileEditPage() {
       </div>
 
       <div className="space-y-8">
-        {/* 基本情報 */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+
+        {/* ── 基本情報 ── */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-5">
           <SectionTitle>基本情報</SectionTitle>
 
-          <div className="flex items-center gap-4">
-            {form.avatar && (
-              <Image src={form.avatar} alt="avatar" width={64} height={64} className="rounded-full border" unoptimized />
-            )}
-            <div className="flex-1">
-              <Input label={t.profile.avatar} value={form.avatar} onChange={(v) => set("avatar", v)}
-                placeholder="https://avatars.githubusercontent.com/..." />
-            </div>
-          </div>
+          <AvatarSection
+            avatar={form.avatar}
+            onAvatarChange={(url) => set("avatar", url)}
+          />
 
           {form.coverImage && (
             <div className="h-24 rounded-lg overflow-hidden bg-gray-100">
-              <img src={form.coverImage} alt="cover" className="w-full h-full object-cover" />
+              <img src={form.coverImage} alt="cover" loading="lazy" className="w-full h-full object-cover" />
             </div>
           )}
-          <Input label={t.profile.coverImage} value={form.coverImage ?? ""} onChange={(v) => set("coverImage", v)}
-            placeholder="https://..." />
+          <Input
+            label={t.profile.coverImage}
+            value={form.coverImage ?? ""}
+            onChange={(v) => set("coverImage", v)}
+            placeholder="https://..."
+          />
 
-          <Input label={t.profile.displayName} value={form.displayName} onChange={(v) => set("displayName", v)}
-            placeholder={login} />
-          <Input label={t.profile.catchphrase} value={form.catchphrase} onChange={(v) => set("catchphrase", v)}
-            placeholder="Claude Code歴1年のフルスタック開発者" maxLength={50} />
-          <Textarea label={t.profile.bio} value={form.bio} onChange={(v) => set("bio", v)}
-            rows={6} maxLength={1000} placeholder={"## 自己紹介\n\n経歴・得意分野・実績を自由に記述..."} />
+          <Input
+            label={t.profile.displayName}
+            value={form.displayName}
+            onChange={(v) => set("displayName", v)}
+            placeholder={login}
+          />
+          <Input
+            label={t.profile.catchphrase}
+            value={form.catchphrase}
+            onChange={(v) => set("catchphrase", v)}
+            placeholder="Claude Code歴1年のフルスタック開発者"
+            maxLength={50}
+          />
+          <Textarea
+            label={t.profile.bio}
+            value={form.bio}
+            onChange={(v) => set("bio", v)}
+            rows={6}
+            maxLength={1000}
+            placeholder={"## 自己紹介\n\n経歴・得意分野・実績を自由に記述..."}
+          />
         </div>
 
-        {/* スキル・専門 */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+        {/* ── スキル・専門分野 ── */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-5">
           <SectionTitle>スキル・専門分野</SectionTitle>
-          <CheckGroup label={t.profile.specialties} options={SPECIALTIES}
-            selected={form.specialties} onChange={(v) => set("specialties", v)} max={5} />
-          <CheckGroup label={t.profile.tools}
+          <CheckGroup
+            label={t.profile.specialties}
+            options={SPECIALTIES}
+            selected={form.specialties}
+            onChange={(v) => set("specialties", v)}
+            max={5}
+          />
+          <CheckGroup
+            label={t.profile.tools}
             options={TOOLS.map((x) => x.label)}
             selected={form.tools.map((v) => toolLabels[v] ?? v)}
-            onChange={(v) => set("tools", v.map((label) => TOOLS.find((tk) => tk.label === label)?.value ?? label as Tool))}
+            onChange={(v) =>
+              set("tools", v.map((label) => TOOLS.find((tk) => tk.label === label)?.value ?? label as Tool))
+            }
           />
-          <TagInput label={t.profile.skillTags} tags={form.skillTags} onChange={(v) => set("skillTags", v)} max={15}
-            placeholder="TypeScript, Next.js, Python..." />
+          <TagInput
+            label={t.profile.skillTags}
+            tags={form.skillTags}
+            onChange={(v) => set("skillTags", v)}
+            max={15}
+            placeholder="TypeScript, Next.js, Python..."
+          />
         </div>
 
-        {/* 稼働状況 */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
-          <SectionTitle>稼働状況・スケジュール</SectionTitle>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">{t.profile.availability}</label>
-            <div className="flex gap-3">
-              {AVAIL.map((a) => (
-                <button key={a.value} type="button"
-                  onClick={() => set("availability", a.value)}
-                  className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
-                    form.availability === a.value ? a.cls : "bg-white text-gray-500 border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  {a.label}
-                </button>
-              ))}
-            </div>
-          </div>
-          <Input label={t.profile.schedule} value={form.schedule ?? ""} onChange={(v) => set("schedule", v)}
-            placeholder="平日18時以降、週末も対応可能" />
-        </div>
-
-        {/* 経歴 */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6">
-          <SectionTitle>{t.profile.career}</SectionTitle>
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">{t.profile.work}</h3>
-            <WorkEditor entries={form.career.work}
-              onChange={(v) => set("career", { ...form.career, work: v })} />
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">{t.profile.education}</h3>
-            <EduEditor entries={form.career.education}
-              onChange={(v) => set("career", { ...form.career, education: v })} />
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">{t.profile.awards}</h3>
-            <AwardEditor entries={form.career.awards}
-              onChange={(v) => set("career", { ...form.career, awards: v })} />
-          </div>
-        </div>
-
-        {/* ポートフォリオ */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <SectionTitle>{t.profile.portfolio}</SectionTitle>
-          <PortfolioEditor entries={form.portfolio} onChange={(v) => set("portfolio", v)} />
-        </div>
-
-        {/* SNS */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+        {/* ── SNSリンク ── */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
           <SectionTitle>{t.profile.sns}</SectionTitle>
-          <Input label="GitHub" value={form.sns.github ?? ""} onChange={(v) => set("sns", { ...form.sns, github: v })}
-            placeholder="https://github.com/username" />
-          <Input label="X (Twitter)" value={form.sns.twitter ?? ""} onChange={(v) => set("sns", { ...form.sns, twitter: v })}
-            placeholder="https://x.com/username" />
-          <Input label="Website" value={form.sns.website ?? ""} onChange={(v) => set("sns", { ...form.sns, website: v })}
-            placeholder="https://..." />
+          <Input
+            label="GitHub"
+            value={form.sns.github ?? ""}
+            onChange={(v) => set("sns", { ...form.sns, github: v })}
+            placeholder="https://github.com/username"
+          />
+          <Input
+            label="X (Twitter)"
+            value={form.sns.twitter ?? ""}
+            onChange={(v) => set("sns", { ...form.sns, twitter: v })}
+            placeholder="https://x.com/username"
+          />
+          <Input
+            label="Website"
+            value={form.sns.website ?? ""}
+            onChange={(v) => set("sns", { ...form.sns, website: v })}
+            placeholder="https://..."
+          />
         </div>
 
-        {/* Save button (bottom) */}
-        <div className="flex justify-end">
+        {/* ── 実績（折りたたみ） ── */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+          <button
+            type="button"
+            onClick={() => setAchievementsOpen((v) => !v)}
+            className="w-full flex items-center justify-between group"
+          >
+            <h2 className="text-base font-semibold text-gray-800 dark:text-white group-hover:text-purple-600 transition-colors">
+              実績 <span className="text-xs text-gray-400 font-normal ml-1">任意</span>
+            </h2>
+            <span className={`text-gray-400 text-sm transition-transform duration-200 ${achievementsOpen ? "rotate-180" : ""}`}>
+              {achievementsOpen ? "▲" : "▼ 追加する"}
+            </span>
+          </button>
+
+          {achievementsOpen && (
+            <div className="mt-4">
+              <Textarea
+                label=""
+                value={form.achievements ?? ""}
+                onChange={(v) => set("achievements", v)}
+                rows={6}
+                placeholder={"例:\n- AI系Webサービスを2つ開発・公開\n- note有料記事を執筆（累計売上10万円）\n- OSSコントリビューター（Stars 500+）\n- 〇〇ハッカソン 最優秀賞"}
+              />
+              <p className="text-xs text-gray-400 mt-1.5">Markdown記法が使えます。職歴・学歴・受賞歴・ポートフォリオを自由に記述できます。</p>
+            </div>
+          )}
+        </div>
+
+        {/* ── 保存ボタン ── */}
+        <div className="flex justify-end pb-4">
           <button
             onClick={save}
             disabled={saving}

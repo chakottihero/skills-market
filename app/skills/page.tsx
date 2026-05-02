@@ -42,7 +42,7 @@ function SkillsPageInner() {
     if (query)       params.set("q", query);
     const res = await fetch(`/api/skills?${params}`);
     const data = await res.json();
-    setProducts(data.products as Product[]);
+    setProducts((data.products as Product[]) ?? []);
     setLoading(false);
   }, [query, category, subcategory, tool, priceType, sort]);
 
@@ -83,14 +83,14 @@ function SkillsPageInner() {
     `flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors whitespace-nowrap ${
       val === active
         ? "bg-purple-600 text-white border-purple-600"
-        : "bg-white text-gray-600 border-gray-200 hover:border-purple-300"
+        : "bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-200 border-gray-200 dark:border-gray-600 hover:border-purple-300"
     }`;
 
   const subChipCls = (val: string, active: string) =>
     `flex-shrink-0 px-2.5 py-1 rounded-full text-xs border transition-colors whitespace-nowrap ${
       val === active
         ? "bg-purple-100 text-purple-700 border-purple-300 font-medium"
-        : "bg-gray-50 text-gray-500 border-gray-200 hover:border-gray-400"
+        : "bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:border-gray-400"
     }`;
 
   const selectedCat = category ? CATEGORY_MAP[category] : null;
@@ -104,10 +104,10 @@ function SkillsPageInner() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">{t.skills.title}</h1>
+      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">{t.skills.title}</h1>
 
       {/* Filter card */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 mb-4 space-y-3">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 mb-4 space-y-3 sticky top-0 z-20 shadow-sm">
 
         {/* Row 1: Search + Sort */}
         <div className="flex gap-3">
@@ -116,12 +116,12 @@ function SkillsPageInner() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t.skills.searchPlaceholder}
-            className="flex-1 border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+            className="flex-1 border border-gray-200 dark:border-gray-600 rounded-lg px-4 py-2 text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-400 placeholder-gray-400"
           />
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value)}
-            className="hidden sm:block border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white"
+            className="hidden sm:block border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           >
             {SORT_OPTIONS.map(({ value, label }) => (
               <option key={value} value={value}>{label}</option>
@@ -135,7 +135,7 @@ function SkillsPageInner() {
             <select
               value={category}
               onChange={(e) => handleSetCategory(e.target.value)}
-              className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white"
+              className="border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
               <option value="">{t.skills.allCategories}</option>
               {CATEGORIES.map((cat) => (
@@ -148,7 +148,7 @@ function SkillsPageInner() {
               <select
                 value={subcategory}
                 onChange={(e) => setSubcategory(e.target.value)}
-                className="border border-purple-200 rounded-lg px-3 py-2 text-sm bg-white text-purple-700"
+                className="border border-purple-200 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-purple-700 dark:text-purple-300"
               >
                 <option value="">{t.filter.allSubcategories}</option>
                 {selectedCat.subcategories.map((sub) => (
@@ -160,22 +160,22 @@ function SkillsPageInner() {
           <select
             value={tool}
             onChange={(e) => setTool(e.target.value)}
-            className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white self-start"
+            className="border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white self-start"
           >
             <option value="">{t.skills.allTools}</option>
             {TOOLS.map((tk) => (
               <option key={tk.id} value={tk.id}>{tk.name}</option>
             ))}
           </select>
-          <div className="flex gap-1 ml-auto bg-gray-100 rounded-lg p-1 self-start">
+          <div className="flex gap-1 ml-auto bg-gray-100 dark:bg-gray-700 rounded-lg p-1 self-start">
             {PRICE_TABS.map(({ value, label }) => (
               <button
                 key={value}
                 onClick={() => setPriceType(value)}
                 className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
                   priceType === value
-                    ? "bg-white text-purple-700 shadow-sm"
-                    : "text-gray-500 hover:text-gray-800"
+                    ? "bg-white dark:bg-gray-600 text-purple-700 dark:text-purple-300 shadow-sm"
+                    : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
                 }`}
               >
                 {label}
@@ -193,7 +193,7 @@ function SkillsPageInner() {
                 {label}
               </button>
             ))}
-            <span className="flex-shrink-0 w-px bg-gray-200 self-stretch mx-1" />
+            <span className="flex-shrink-0 w-px bg-gray-200 dark:bg-gray-600 self-stretch mx-1" />
             {SORT_OPTIONS.map(({ value, label }) => (
               <button key={value} onClick={() => setSort(value)} className={chipCls(value, sort)}>
                 {label}
@@ -223,7 +223,7 @@ function SkillsPageInner() {
                     className={`px-2 py-1.5 rounded-lg text-xs font-medium border transition-colors text-left leading-tight ${
                       cat.id === category
                         ? "bg-purple-600 text-white border-purple-600"
-                        : "bg-white text-gray-600 border-gray-200 hover:border-purple-300"
+                        : "bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-200 border-gray-200 dark:border-gray-600 hover:border-purple-300"
                     }`}
                   >
                     {cat.icon} {getCategoryName(cat.id, locale)}
@@ -264,7 +264,7 @@ function SkillsPageInner() {
       {/* Active filter tags */}
       {hasActiveFilters && (
         <div className="flex flex-wrap gap-2 mb-4 items-center">
-          <span className="text-xs text-gray-500">{t.filter.activeFilters}:</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">{t.filter.activeFilters}:</span>
           {category && (
             <button
               onClick={() => { setCategory(""); setSubcategory(""); }}
@@ -305,15 +305,15 @@ function SkillsPageInner() {
       )}
 
       {loading ? (
-        <div className="text-center text-gray-400 py-20">{t.common.loading}</div>
+        <div className="text-center text-gray-400 dark:text-gray-500 py-20">{t.common.loading}</div>
       ) : products.length === 0 ? (
         <div className="text-center py-20">
-          <p className="text-gray-500 font-medium mb-1">
+          <p className="text-gray-500 dark:text-gray-300 font-medium mb-1">
             {hasActiveFilters ? t.skills.noResults : t.empty.noSkills}
           </p>
           {!hasActiveFilters && (
             <>
-              <p className="text-gray-400 text-sm mb-6">{t.empty.beFirst}</p>
+              <p className="text-gray-400 dark:text-gray-400 text-sm mb-6">{t.empty.beFirst}</p>
               <Link href="/sell" className="inline-block bg-purple-600 text-white font-semibold px-6 py-2.5 rounded-full hover:bg-purple-700 transition-colors text-sm">
                 {t.empty.listSkill} →
               </Link>
@@ -322,7 +322,7 @@ function SkillsPageInner() {
         </div>
       ) : (
         <>
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-gray-500 dark:text-gray-300 mb-4">
             {t.filter.results.replace("{count}", String(products.length))}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">

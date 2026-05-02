@@ -26,13 +26,13 @@ export default function CategoriesPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">{t.categories.title}</h1>
+      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">{t.categories.title}</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {CATEGORIES.map((cat) => (
           <div
             key={cat.id}
-            className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md hover:border-purple-200 transition-all"
+            className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md hover:border-purple-200 dark:hover:border-purple-600 transition-all"
           >
             {/* Category header */}
             <Link
@@ -41,10 +41,10 @@ export default function CategoriesPage() {
             >
               <div className="text-3xl flex-shrink-0">{cat.icon}</div>
               <div className="min-w-0">
-                <h2 className="font-semibold text-gray-900 group-hover:text-purple-600 transition-colors leading-tight">
+                <h2 className="font-semibold text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors leading-tight">
                   {getCategoryName(cat.id, locale)}
                 </h2>
-                <p className="text-xs text-gray-400 mt-0.5">
+                <p className="text-xs text-gray-400 dark:text-gray-400 mt-0.5">
                   {counts[cat.id] ?? 0} {t.categories.skillCount}
                 </p>
               </div>
@@ -57,14 +57,14 @@ export default function CategoriesPage() {
                   <Link
                     key={sub.id}
                     href={`/skills?category=${cat.id}&subcategory=${sub.id}`}
-                    className="text-xs px-2.5 py-1 rounded-full bg-gray-50 text-gray-600 border border-gray-200 hover:bg-purple-50 hover:text-purple-700 hover:border-purple-300 transition-colors whitespace-nowrap"
+                    className="text-xs px-2.5 py-1 rounded-full bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:text-purple-700 dark:hover:text-purple-300 hover:border-purple-300 transition-colors whitespace-nowrap"
                   >
                     {subName(sub)}
                   </Link>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-gray-400 italic">—</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 italic">—</p>
             )}
           </div>
         ))}

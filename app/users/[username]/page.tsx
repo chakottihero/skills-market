@@ -84,7 +84,7 @@ export default function UserProfilePage() {
         )}
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2 mb-1">
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               {profile.displayName || profile.username}
             </h1>
             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${avail.cls}`}>
@@ -92,7 +92,7 @@ export default function UserProfilePage() {
             </span>
           </div>
           {profile.catchphrase && (
-            <p className="text-gray-500 text-sm">{profile.catchphrase}</p>
+            <p className="text-gray-500 dark:text-gray-300 text-sm">{profile.catchphrase}</p>
           )}
         </div>
         {/* SNS links */}
@@ -128,8 +128,8 @@ export default function UserProfilePage() {
           {/* Bio */}
           {profile.bio && (
             <div>
-              <h2 className="text-lg font-bold text-gray-900 mb-3">自己紹介</h2>
-              <div className="prose prose-sm max-w-none text-gray-700">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">自己紹介</h2>
+              <div className="prose prose-sm max-w-none text-gray-700 dark:text-gray-200">
                 <ReactMarkdown>{profile.bio}</ReactMarkdown>
               </div>
             </div>
@@ -138,13 +138,13 @@ export default function UserProfilePage() {
           {/* Work history */}
           {profile.career.work.length > 0 && (
             <div>
-              <h2 className="text-lg font-bold text-gray-900 mb-3">{t.profile.work}</h2>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">{t.profile.work}</h2>
               <div className="space-y-4">
                 {profile.career.work.map((w, i) => (
                   <div key={i} className="flex gap-4">
                     <div className="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-purple-400" />
                     <div>
-                      <div className="font-semibold text-gray-900">{w.role}</div>
+                      <div className="font-semibold text-gray-900 dark:text-white">{w.role}</div>
                       <div className="text-sm text-gray-500">{w.company} · {w.period}</div>
                     </div>
                   </div>
@@ -156,7 +156,7 @@ export default function UserProfilePage() {
           {/* Education */}
           {profile.career.education.length > 0 && (
             <div>
-              <h2 className="text-lg font-bold text-gray-900 mb-3">{t.profile.education}</h2>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">{t.profile.education}</h2>
               <div className="space-y-3">
                 {profile.career.education.map((e, i) => (
                   <div key={i} className="flex gap-4">
@@ -174,7 +174,7 @@ export default function UserProfilePage() {
           {/* Awards */}
           {profile.career.awards.length > 0 && (
             <div>
-              <h2 className="text-lg font-bold text-gray-900 mb-3">{t.profile.awards}</h2>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">{t.profile.awards}</h2>
               <div className="space-y-3">
                 {profile.career.awards.map((a, i) => (
                   <div key={i} className="flex gap-4">
@@ -193,7 +193,7 @@ export default function UserProfilePage() {
           {/* Portfolio */}
           {profile.portfolio.length > 0 && (
             <div>
-              <h2 className="text-lg font-bold text-gray-900 mb-3">{t.profile.portfolio}</h2>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">{t.profile.portfolio}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {profile.portfolio.map((p, i) => (
                   <a
@@ -201,7 +201,7 @@ export default function UserProfilePage() {
                     href={p.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md hover:border-gray-300 transition-all"
+                    className="block bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all"
                   >
                     <div className="font-semibold text-gray-900 mb-1 line-clamp-1">{p.title}</div>
                     {p.description && <p className="text-xs text-gray-500 line-clamp-2">{p.description}</p>}
@@ -232,7 +232,7 @@ export default function UserProfilePage() {
         {/* Right sidebar */}
         <div className="space-y-5">
           {/* Availability + schedule */}
-          <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
             <div className="text-xs text-gray-400 mb-1">{t.profile.availability}</div>
             <span className={`inline-block text-sm font-semibold px-3 py-1 rounded-full ${avail.cls}`}>
               {avail.label}
@@ -244,8 +244,8 @@ export default function UserProfilePage() {
 
           {/* Specialties */}
           {profile.specialties.length > 0 && (
-            <div className="bg-white border border-gray-200 rounded-xl p-4">
-              <div className="text-xs text-gray-400 mb-2">{t.profile.specialties}</div>
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+              <div className="text-xs text-gray-400 dark:text-gray-400 mb-2">{t.profile.specialties}</div>
               <div className="flex flex-wrap gap-1.5">
                 {profile.specialties.map((s) => (
                   <span key={s} className="text-xs bg-purple-50 text-purple-700 px-2.5 py-1 rounded-full font-medium">
@@ -258,8 +258,8 @@ export default function UserProfilePage() {
 
           {/* Supported tools */}
           {profile.tools.length > 0 && (
-            <div className="bg-white border border-gray-200 rounded-xl p-4">
-              <div className="text-xs text-gray-400 mb-2">{t.profile.tools}</div>
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+              <div className="text-xs text-gray-400 dark:text-gray-400 mb-2">{t.profile.tools}</div>
               <div className="flex flex-wrap gap-1.5">
                 {profile.tools.map((tool) => {
                   const tc = toolColors[tool as keyof typeof toolColors] ?? toolColors.other;
@@ -279,8 +279,8 @@ export default function UserProfilePage() {
 
           {/* Skills / tags */}
           {profile.skillTags.length > 0 && (
-            <div className="bg-white border border-gray-200 rounded-xl p-4">
-              <div className="text-xs text-gray-400 mb-2">{t.profile.skillTags}</div>
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+              <div className="text-xs text-gray-400 dark:text-gray-400 mb-2">{t.profile.skillTags}</div>
               <div className="flex flex-wrap gap-1.5">
                 {profile.skillTags.map((s) => (
                   <span key={s} className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">
