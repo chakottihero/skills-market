@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useLanguage } from "@/components/LanguageContext";
 import type { Locale } from "@/lib/i18n";
+import { setCookie, getCookieWithMigration } from "@/lib/cookies";
 
 const STORAGE_KEY = "tutorial_completed";
 const SKIP_PATHS = ["/terms", "/privacy", "/legal"];
@@ -197,12 +198,12 @@ export default function Tutorial() {
       return;
     }
 
-    // status === "unauthenticated": apply localStorage checks
+    // status === "unauthenticated": apply cookie checks (migrates from localStorage on first run)
     const shouldShow = () => {
       try {
         return (
-          localStorage.getItem("terms_accepted") === "true" &&
-          localStorage.getItem(STORAGE_KEY) !== "true"
+          getCookieWithMigration("terms_accepted") === "true" &&
+          getCookieWithMigration(STORAGE_KEY) !== "true"
         );
       } catch { return false; }
     };
@@ -232,10 +233,8 @@ export default function Tutorial() {
   }, [visible]);
 
   const complete = useCallback(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, "true");
-      localStorage.setItem(`${STORAGE_KEY}_at`, new Date().toISOString());
-    } catch {}
+    setCookie(STORAGE_KEY, "true");
+    setCookie(`${STORAGE_KEY}_at`, new Date().toISOString());
     // close sidebar if open
     window.dispatchEvent(new CustomEvent("tutorial:close-sidebar"));
     setVisible(false);
