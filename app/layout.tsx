@@ -5,6 +5,7 @@ import Providers from "@/components/Providers";
 import Navbar from "@/components/Navbar";
 import TermsAgreementModal from "@/components/TermsAgreementModal";
 import Tutorial from "@/components/Tutorial";
+import { Analytics } from "@vercel/analytics/next";
 
 const geist = Geist({ subsets: ["latin"] });
 
@@ -110,6 +111,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </footer>
         </Providers>
+        <Analytics />
       </body>
     </html>
   );
