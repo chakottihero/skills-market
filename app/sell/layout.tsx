@@ -8,6 +8,7 @@ export const metadata: Metadata = {
     title: "スキルを出品する | AI Skill Market",
     description: "あなたのAIエージェント向けスキルファイルを出品・販売しましょう。無料・有料どちらにも対応。",
     url: "https://aiskill-market.com/sell",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "AI Skill Market" }],
   },
 };
 

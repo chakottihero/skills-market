@@ -8,6 +8,7 @@ export const metadata: Metadata = {
     title: "特定商取引法に基づく表記 | AI Skill Market",
     description: "AI Skill Marketの特定商取引法に基づく表記です。",
     url: "https://aiskill-market.com/legal",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "AI Skill Market" }],
   },
 };
 

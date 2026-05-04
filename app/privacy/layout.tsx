@@ -8,6 +8,7 @@ export const metadata: Metadata = {
     title: "プライバシーポリシー | AI Skill Market",
     description: "AI Skill Marketのプライバシーポリシーです。",
     url: "https://aiskill-market.com/privacy",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "AI Skill Market" }],
   },
 };
 

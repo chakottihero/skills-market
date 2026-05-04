@@ -8,6 +8,7 @@ export const metadata: Metadata = {
     title: "Skills Marketについて | AI Skill Market",
     description: "AI Skill Marketは、AIエージェント向けスキルファイル（SKILL.md）を売買できるマーケットプレイスです。",
     url: "https://aiskill-market.com/about",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "AI Skill Market" }],
   },
 };
 
