@@ -55,6 +55,7 @@ function ProductPageInner() {
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [canceledBanner, setCanceledBanner] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [showPaymentSuspended, setShowPaymentSuspended] = useState(false);
 
   // User-specific state
   const [hasPurchased, setHasPurchased] = useState(false);
@@ -185,23 +186,8 @@ function ProductPageInner() {
       return;
     }
 
-    setDownloading(true);
-    try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ skillId: id, priceType: "paid" }),
-      });
-      const data = await res.json() as { url?: string; error?: string };
-      if (data.error === "already_purchased") {
-        setHasPurchased(true);
-        setDownloading(false);
-        return;
-      }
-      if (data.url) window.location.href = data.url;
-    } catch {
-      setDownloading(false);
-    }
+    // 決済機能一時停止中
+    setShowPaymentSuspended(true);
   };
 
   const handleDelete = async () => {
@@ -267,6 +253,26 @@ function ProductPageInner() {
       {toast && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-gray-900 text-white text-sm px-5 py-3 rounded-xl shadow-lg">
           {toast}
+        </div>
+      )}
+
+      {/* Payment suspended modal */}
+      {showPaymentSuspended && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4" onClick={() => setShowPaymentSuspended(false)}>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 max-w-sm w-full text-center" onClick={(e) => e.stopPropagation()}>
+            <div className="text-3xl mb-3">🔒</div>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">決済機能を一時停止中</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+              現在セキュリティ対策強化のため、決済機能を一時停止しています。<br />
+              再開時期は X でお知らせします。
+            </p>
+            <button
+              onClick={() => setShowPaymentSuspended(false)}
+              className="mt-5 w-full bg-purple-600 text-white font-semibold py-2.5 rounded-xl hover:bg-purple-700 transition-colors"
+            >
+              閉じる
+            </button>
+          </div>
         </div>
       )}
 
