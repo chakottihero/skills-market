@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { supabaseAdmin, supabaseConfigured } from "@/lib/supabase-admin";
+import { validateUpload, IMAGE_UPLOAD_OPTIONS } from "@/lib/upload-validation";
 
 export const runtime = "nodejs";
 
@@ -18,17 +19,24 @@ export async function POST(req: NextRequest) {
   const login = (session.user as { login?: string }).login ?? session.user.name ?? "unknown";
 
   let filename: string;
+  let mimeType: string | undefined;
+  let fileSize: number | undefined;
   try {
-    const body = await req.json() as { filename?: string };
+    const body = await req.json() as { filename?: string; mimeType?: string; fileSize?: number };
     filename = body.filename || "avatar.jpg";
+    mimeType = typeof body.mimeType === "string" ? body.mimeType : undefined;
+    fileSize = typeof body.fileSize === "number" ? body.fileSize : undefined;
   } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
 
-  const ext = filename.split(".").pop()?.toLowerCase() ?? "jpg";
+  const validation = validateUpload({ filename, mimeType, fileSize }, IMAGE_UPLOAD_OPTIONS);
+  if (!validation.ok) {
+    return NextResponse.json({ error: validation.error }, { status: 400 });
+  }
+
   const timestamp = Date.now();
-  const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, "_");
-  const path = `${login}/${timestamp}_${safeName}`;
+  const path = `${login}/${timestamp}_${validation.sanitizedFilename}`;
 
   const { data, error } = await supabaseAdmin.storage
     .from("avatars")
